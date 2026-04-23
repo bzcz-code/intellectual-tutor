@@ -1,0 +1,38 @@
+# OS and editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Python and notebook caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Node and build caches
+node_modules/
+dist/
+build/
+.cache/
+
+# Generated lesson artifacts
+outputs/
+generated/
+artifacts/
+*.tmp
+*.bak
+
+# Office temporary files
+~$*.docx
+~$*.pptx
+~$*.xlsx
+
+# Local env
+.env
+.env.*
+!.env.example
