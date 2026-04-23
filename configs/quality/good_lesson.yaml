@@ -1,0 +1,54 @@
+good_lesson:
+  course: "人工智能数学基础"
+  chapter_id: "gradient_descent"
+  teacher_verdict_standard: "老师是否愿意在 30 分钟人工微调后拿去上课"
+  minimum_verdict: "可以上课，但必须保留教师现场判断和二次润色"
+  definition:
+    - id: "driving_question"
+      name: "问题牵引"
+      requirement: "整节课必须围绕一个学生能记住的问题：模型犯错之后，参数为什么知道往哪里改？"
+      evidence: "PPT、讲稿、实验和作业都回到这个问题。"
+    - id: "single_spine"
+      name: "单一主线"
+      requirement: "课堂主线固定为 误差 -> 损失函数 -> 梯度 -> 更新公式 -> 学习率 -> 训练表现。"
+      evidence: "不在本章展开反向传播、优化器家族或凸优化理论。"
+    - id: "math_floor"
+      name: "数学底线"
+      requirement: "必须讲清导数符号、负梯度方向、学习率尺度和局部下降；不得承诺非凸问题必达全局最优。"
+      evidence: "至少包含一维推导、多参数推广和边界说明。"
+    - id: "ai_mapping"
+      name: "AI 映射"
+      requirement: "每个数学概念都要映射到训练循环中的一个角色。"
+      evidence: "损失函数对应误差信号，梯度对应更新方向，学习率对应更新尺度。"
+    - id: "visible_experiment"
+      name: "实验可见"
+      requirement: "学生必须能在实验中看见不同学习率导致的慢收敛、稳定收敛和震荡/发散。"
+      evidence: "notebook 可运行，且生成参数轨迹和损失曲线。"
+    - id: "student_evidence"
+      name: "理解证据"
+      requirement: "作业和课堂提问必须能区分会背公式和真正理解。"
+      evidence: "学生需要预测一步更新、解释图像、诊断学习率问题。"
+    - id: "teacher_usability"
+      name: "教师可用"
+      requirement: "材料必须给出时间分配、板书节奏、讲稿话术、误区提醒和评分 rubrics。"
+      evidence: "DOCX 中有完整教学包，质量报告给出是否可上课的判断。"
+fixed_lesson_template:
+  - "讲前判断：这节课值不值得讲、学生会卡在哪里"
+  - "驱动问题：模型犯错之后，参数为什么知道往哪里改"
+  - "玩具模型：一维二次损失函数"
+  - "核心推导：导数、负梯度方向、更新公式"
+  - "AI 映射：训练循环里的 loss、gradient、learning rate"
+  - "课堂实验：学习率对轨迹和损失下降的影响"
+  - "误区处理：全局最优、学习率越大越好、梯度等于答案"
+  - "课堂检查：预测一步更新、解释曲线、诊断训练失败"
+  - "作业评价：概念、推导、实验三类证据"
+  - "课后复盘：老师应观察学生是否能把公式说回训练机制"
+quality_score:
+  pass_threshold: 85
+  dimensions:
+    teaching_speakable: 20
+    math_trustworthy: 20
+    ai_connection: 20
+    experiment_runnable: 15
+    assessment_valid: 15
+    teacher_editability: 10

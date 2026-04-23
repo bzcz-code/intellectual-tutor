@@ -1,0 +1,14 @@
+course:
+  name: "人工智能数学基础"
+  target_students: "研究生补基础"
+  total_hours: 32
+  style: "应用驱动 + 理解数学抽象"
+  language: "中文主讲，保留关键英文术语"
+  derivation_depth: "中等：讲清核心推导，不追求纯数学完备"
+  application_case_ratio: 0.35
+  lab_intensity: "每章至少一个可运行 Python 实验"
+  homework_difficulty: "概念理解 + 基础推导 + 小实验"
+quality_gates:
+  - "教学可讲"
+  - "数学可信"
+  - "AI 连接有效"

@@ -1,0 +1,40 @@
+visual_ppt:
+  role: "PPT skill"
+  purpose: "读取 slide script，应用高级简约模板、公式排版、分步 reveal 和统一版式，输出最终 PPTX。"
+  boundary:
+    - "不自行发明教学内容。"
+    - "不改变 lesson planner 的教学顺序。"
+    - "不让 agent 直接输出最终版式。"
+  template:
+    name: "minimal_academic_keynote"
+    style: "高级简约科研汇报"
+    background: "warm_off_white"
+    typography:
+      title: "Microsoft YaHei"
+      body: "Microsoft YaHei"
+      formula: "Cambria Math"
+    layout_principles:
+      - "每页只表达一个核心认知点。"
+      - "内容不超过页面 50%，保留大面积留白。"
+      - "标题负责提问或收束，不承担长解释。"
+      - "公式居中，符号解释进入讲者备注。"
+      - "同一逻辑页的 reveal 通过物理页展开，保证放映时逐步揭示。"
+  slide_type_rendering:
+    hook: "center_question"
+    conflict: "two_column_tension"
+    insight: "center_highlight"
+    intuition: "two_column_analogy"
+    formalization: "formula_stage"
+    ai_mapping: "process_mapping"
+    recap: "center_highlight"
+    exercise: "center_question"
+  animation_rule: "用 reveal_steps 生成逐步揭示；每一步展开为一张物理页。"
+  quality_score:
+    pass_threshold: 88
+    dimensions:
+      visual_simplicity: 20
+      teaching_rhythm: 20
+      reveal_quality: 20
+      cognitive_guidance: 20
+      formula_clarity: 10
+      classroom_usability: 10

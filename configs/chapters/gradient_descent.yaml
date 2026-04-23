@@ -1,0 +1,41 @@
+chapter:
+  id: "gradient_descent"
+  title: "梯度下降与优化"
+  course_name: "人工智能数学基础"
+  duration_minutes: 120
+  prerequisite_knowledge:
+    - "函数与导数"
+    - "向量与内积"
+    - "基础 Python 与 NumPy"
+  core_concepts:
+    - "损失函数 loss function"
+    - "梯度 gradient"
+    - "方向导数 directional derivative"
+    - "学习率 learning rate"
+    - "收敛 convergence"
+  ai_application_entry: "模型训练如何通过误差反复修正参数"
+  derivation_depth: "从一维二次函数过渡到多参数向量形式"
+  lab_goal: "可视化损失下降、参数更新轨迹与学习率影响"
+  fixed_spine:
+    - "误差 error"
+    - "损失函数 loss function"
+    - "梯度 gradient"
+    - "负梯度更新 negative-gradient update"
+    - "学习率 learning rate"
+    - "训练表现 training dynamics"
+  teacher_takeaway: "这节课不是教学生记住优化公式，而是让他们看见误差如何变成参数更新。"
+  must_not_expand:
+    - "反向传播细节"
+    - "Adam、RMSProp 等优化器家族"
+    - "凸优化完整理论"
+    - "严格收敛性证明"
+  outputs:
+    - "pptx"
+    - "docx"
+    - "ipynb"
+    - "markdown"
+    - "yaml"
+  assessment:
+    - "概念题"
+    - "推导题"
+    - "实验题"

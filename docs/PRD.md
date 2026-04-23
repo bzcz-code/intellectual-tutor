@@ -199,20 +199,43 @@ Agent 可补充：
 - 补齐课程上下文。
 - 拆解单章备课任务。
 - 委派 subagent。
-- 汇总结果。
-- 执行质量门禁。
-- 生成最终成品文件。
+- 产出统一的 lesson plan。
+- 根据质量审查结果发出返工指令。
+- 维护教学主线和质量闭环。
 
-子代理建议：
+主 agent 不直接承担 PPT 版式、公式渲染、notebook 文件工艺或最终文件细节。
 
-- `course_designer`：章节目标、课堂路径、学习结果。
-- `math_abstraction_agent`：数学抽象、推导、严谨性。
-- `ai_application_agent`：AI 场景映射和模型解释。
-- `slide_agent`：PPT 结构与课堂叙事。
-- `lecture_script_agent`：讲稿、课堂话术、板书节奏。
-- `notebook_lab_agent`：Python 实验、可运行代码、可视化。
-- `assessment_agent`：作业、答案、评分 rubrics。
-- `quality_review_agent`：教学、数学、AI 连接三重审查。
+稳定协作链路为：
+
+`Professor Architect Agent -> Subagent 结构化脚本 -> Skill 稳定执行文件产物`
+
+### 6.1 Subagent
+
+Subagent 只负责把 lesson plan 转译成某类产物的结构化脚本，不直接产出最终文件。
+
+- `PPT Script Subagent`：把 lesson plan 转换为 `ppt_script.yaml`，描述 slide type、reveal steps、notes、formula spec 和 visual intent；不输出 PPTX，不指定最终坐标、字体、颜色或版式。
+- `Notebook Lab Subagent`：把 lesson plan 转换为 notebook 实验脚本，描述实验目标、代码单元、观察问题和预期现象；不直接产出最终 IPYNB 文件。
+- `Quality Review Subagent`：只给审查结论和修改建议，指出应返工的责任方；不直接改 lesson plan、slide script 或 notebook script。
+
+### 6.2 Skills
+
+Skill 只负责稳定执行结构化脚本，不决定教学内容。
+
+- `ppt_designer`：读取 `ppt_script.yaml` 和视觉配置，输出 PPTX 和 PPT 质量报告。
+- `formula_renderer`：读取 formula spec，稳定渲染公式并保证符号表达清晰。
+- `notebook_builder`：读取 notebook 实验脚本，输出可运行 IPYNB 和必要图像。
+- `verification`：检查最终产物、source bundle 和架构边界是否满足验收要求。
+
+### 6.3 接口与返工规则
+
+- `lesson_plan.yaml` 是主 agent 到所有 subagent 的唯一教学内容源。
+- `ppt_script.yaml` 只能描述课堂结构、揭示步骤、公式、讲者备注和视觉意图。
+- notebook 中间脚本只能描述实验目标、代码单元、观察问题和预期现象。
+- Quality Review 输出只包含是否可上课、问题清单、修改建议和应返工责任方。
+- 教学主线问题由 `Professor Architect Agent` 修 lesson plan。
+- PPT 结构问题由 `PPT Script Subagent` 修 slide script。
+- 实验问题由 `Notebook Lab Subagent` 修 notebook script。
+- 文件工艺问题由对应 skill 重新执行。
 
 所有成品生成前必须通过三重质量门禁：
 
@@ -238,7 +261,7 @@ Agent 可补充：
 
 第一，不能替代教师对学生现场状态的判断。研究生背景差异很大，哪些地方学生真的卡住、哪些地方可以跳过，需要教师在课堂中判断。
 
-第二，数学严谨性是高风险点。梯度下降、概率、优化、信息论等内容很容易出现“看起来对，细看不严谨”的解释。必须由 `math_abstraction_agent` 和 `quality_review_agent` 审查。
+第二，数学严谨性是高风险点。梯度下降、概率、优化、信息论等内容很容易出现“看起来对，细看不严谨”的解释。必须由 `Professor Architect Agent` 在 lesson plan 中标注适用边界，并由 `Quality Review Subagent` 审查。
 
 第三，最新 AI 案例容易浮于表面。新案例必须服从章节目标，不能为了新鲜而削弱概念理解。
 
@@ -266,6 +289,7 @@ Agent 可补充：
 - 提供可运行实验和可评价作业。
 - 沉淀教师课程资产。
 - 提醒数学严谨性和案例相关性风险。
+- 保持主 agent、subagent 和 skill 的职责边界清晰。
 
 系统不应该做：
 
@@ -273,6 +297,10 @@ Agent 可补充：
 - 在未审查来源的情况下使用外部资料。
 - 输出没有可追溯依据的最新案例。
 - 为了生成完整文件而牺牲教学逻辑和数学严谨性。
+- 让主 agent 直接承担所有版式与文件工艺。
+- 让 subagent 直接输出最终文件。
+- 让 skill 自行发明教学内容。
+- 让 quality review 同时审查和修改内容。
 
 ## 9. 测试计划
 
@@ -328,6 +356,17 @@ Agent 补充的新案例必须：
 - AI 应用连接有效。
 - 老师能继续编辑和版本管理。
 
+### 9.6 架构边界测试
+
+PRD、README、MVP 说明和 `agent_brief.yaml` 必须使用同一套 agent/subagent/skill 命名。
+
+验收要求：
+
+- 不出现“主 agent 直接生成最终 PPTX”的职责描述。
+- 不出现“skill 自行补充教学内容”的职责描述。
+- Quality Review 只给修改建议，不直接修改内容。
+- source bundle 保留 lesson plan、结构化脚本、质量标准和生成配置，便于返工追踪。
+
 ## 10. 假设
 
 - 第一版产品形态是 Hermes Agent 包，不做 Web 教师工作台。
@@ -335,4 +374,4 @@ Agent 补充的新案例必须：
 - 教学风格采用“应用驱动加理解数学抽象”。
 - 资产库第一版采用文件型结构，后续可再接数据库或 Web 工作台。
 - 默认语言策略为中文主讲 + 英文术语。
-- 第一版只提交 PRD 和项目说明，不创建 Hermes Agent 配置、skills、tools 的实际实现文件。
+- 当前 MVP 优先完成文件型资产、结构化脚本和本地生成闭环；正式 Hermes Agent 配置、可独立复用的 skills/tools 可在下一阶段拆出。

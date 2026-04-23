@@ -1,0 +1,37 @@
+reveal_schema:
+  version: 1
+  purpose: "PPT subagent 输出的中间层。它描述课堂揭示顺序，不描述最终版式。"
+  required_slide_fields:
+    - slide_id
+    - slide_type
+    - title
+    - teaching_purpose
+    - content
+    - reveal_steps
+    - notes
+    - formula_spec
+    - visual_intent
+  required_reveal_step_fields:
+    - step_id
+    - kind
+    - text
+  allowed_slide_types:
+    - hook
+    - conflict
+    - insight
+    - intuition
+    - formalization
+    - ai_mapping
+    - recap
+    - exercise
+  allowed_reveal_kinds:
+    - question
+    - idea
+    - formula
+    - mapping
+    - check
+  invariants:
+    - "slide script 不包含坐标、字体、颜色、具体版式名称。"
+    - "slide script 只描述教学意图、揭示步骤、公式和视觉意图。"
+    - "ppt skill 不得新增教学内容，只能呈现 slide script 已有内容。"
+    - "公式必须放在 formula_spec 中，reveal_steps 只能引用或解释公式。"

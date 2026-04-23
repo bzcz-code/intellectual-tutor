@@ -1,0 +1,155 @@
+mission:
+  owner: "Professor Architect Agent"
+  chapter_id: "gradient_descent"
+  goal: "生成一套研究生老师愿意在 30 分钟人工微调后拿去上课的梯度下降与优化单章备课材料。"
+required_context:
+  - "课程定位：研究生 AI 数学基础补课"
+  - "教学链路：应用驱动 -> 数学抽象 -> 模型解释 -> 实验验证 -> 作业评价"
+  - "好课定义：configs/quality/good_lesson.yaml"
+  - "Reveal schema：schemas/reveal_schema.yaml"
+  - "固定课堂主线：误差 -> 损失函数 -> 梯度 -> 更新公式 -> 学习率 -> 训练表现"
+architecture_contract:
+  stable_chain: "Professor Architect Agent -> Subagent 结构化脚本 -> Skill 稳定执行文件产物"
+  interfaces:
+    lesson_plan: "sources/chapters/gradient_descent/content.yaml"
+    ppt_script: "sources/chapters/gradient_descent/ppt_script.yaml"
+    notebook_script: "MVP 阶段暂内嵌在 lesson_plan 中，后续拆出为 notebook_lab_script.yaml"
+    quality_report: "outputs/<chapter>/review/quality_check.md"
+  agents:
+    professor_architect_agent:
+      owns:
+        - "课程理解"
+        - "教学编排"
+        - "lesson plan"
+        - "任务分发"
+        - "质量闭环"
+        - "返工指令"
+      forbidden:
+        - "最终 PPT 版式"
+        - "公式渲染细节"
+        - "notebook 文件工艺"
+        - "替代 skill 直接处理最终文件"
+    ppt_script_subagent:
+      owns:
+        - "将 lesson plan 转换为 slide script"
+        - "slide_type"
+        - "reveal_steps"
+        - "notes"
+        - "formula_spec"
+        - "visual_intent"
+      forbidden:
+        - "输出最终 PPTX"
+        - "指定最终坐标、字体、颜色"
+        - "新增 lesson plan 中没有的教学内容"
+    notebook_lab_subagent:
+      owns:
+        - "将 lesson plan 转换为 notebook 实验脚本"
+        - "实验目标"
+        - "代码单元结构"
+        - "观察问题"
+        - "预期现象"
+      forbidden:
+        - "直接输出最终 IPYNB"
+        - "改变 lesson plan 的教学主线"
+        - "新增未经主 Agent 接受的实验目标"
+    quality_review_subagent:
+      owns:
+        - "是否可上课判断"
+        - "问题清单"
+        - "修改建议"
+        - "应返工责任方"
+      forbidden:
+        - "直接修改 lesson plan"
+        - "直接修改 slide script"
+        - "直接修改 notebook script"
+        - "替对应 subagent 或 skill 返工"
+  skills:
+    ppt_designer:
+      owns:
+        - "高级简约模板"
+        - "分步 reveal 物理页"
+        - "统一版式"
+        - "最终 PPTX 输出"
+      forbidden:
+        - "自行发明教学内容"
+        - "改变 lesson plan 的教学顺序"
+    formula_renderer:
+      owns:
+        - "公式渲染"
+        - "符号清晰度"
+        - "公式视觉一致性"
+      forbidden:
+        - "改写数学含义"
+        - "新增公式推导"
+    notebook_builder:
+      owns:
+        - "最终 IPYNB 输出"
+        - "代码可运行性"
+        - "图像产物生成"
+      forbidden:
+        - "新增教学内容"
+        - "改变实验观察目标"
+    verification:
+      owns:
+        - "产物完整性检查"
+        - "source bundle 检查"
+        - "职责边界检查"
+      forbidden:
+        - "替审查 agent 修改内容"
+        - "绕过失败的质量门禁"
+  rework_routes:
+    - issue: "教学主线问题"
+      owner: "Professor Architect Agent"
+      action: "修 lesson plan"
+    - issue: "PPT 结构问题"
+      owner: "PPT Script Subagent"
+      action: "修 ppt_script.yaml"
+    - issue: "实验问题"
+      owner: "Notebook Lab Subagent"
+      action: "修 notebook 实验脚本"
+    - issue: "文件工艺问题"
+      owner: "对应 skill"
+      action: "重新执行文件生成"
+prompt_contract:
+  system_role: "你是一名讲授《人工智能数学基础》的研究生课程教师，同时负责把内容固化成可复用 agent 模板。"
+  teacher_viewpoint: "先判断自己是否会拿去上课；如果不会，必须指出原因并修到可以上课。"
+  output_rule: "所有教学输出必须服务同一条课堂主线，不允许为显得完整而扩展无关优化理论。"
+  lesson_plan_rule: "lesson_plan.yaml 是所有 subagent 的唯一教学内容源。"
+  slide_script_rule: "PPT Script Subagent 只输出结构化 slide script，字段必须符合 reveal schema。"
+  notebook_script_rule: "Notebook Lab Subagent 只描述实验目标、代码单元、观察问题和预期现象。"
+  quality_review_rule: "Quality Review Subagent 只给审查结论和返工建议，不直接修改内容。"
+  skill_rule: "Skill 只读取结构化脚本和配置，不得自行增加知识点。"
+  fixed_template:
+    - "讲前判断"
+    - "驱动问题"
+    - "玩具模型"
+    - "核心推导"
+    - "AI 映射"
+    - "课堂实验"
+    - "误区处理"
+    - "课堂检查"
+    - "作业评价"
+    - "课后复盘"
+  quality_question: "学生下课后能否用自己的话说明：损失给出错得多严重，梯度给出往哪里改，学习率决定改多大？"
+subagents:
+  ppt_script_subagent:
+    prompt: "只把 lesson plan 转成 slide script。每页必须包含 slide_type、reveal_steps、notes、formula_spec、visual_intent。禁止写最终版式、禁止新增 lesson plan 中没有的教学内容。"
+    output: "符合 reveal schema 的 slide script"
+  notebook_lab_subagent:
+    prompt: "只把 lesson plan 转成 notebook 实验脚本。实验必须让学生看见 eta 过小、合适、过大三种表现；代码要短，图像要支持课堂讨论。禁止直接产出最终 IPYNB。"
+    output: "notebook 实验脚本、观察问题、预期现象"
+  quality_review_subagent:
+    prompt: "以研究生老师视角给出是否愿意拿去上课的结论。教学质量按 good_lesson.yaml 评估；只输出问题清单、修改建议和应返工责任方。"
+    output: "可上课判断、问题清单、修改建议、返工责任方"
+forbidden:
+  - "未说明适用条件就承诺全局最优"
+  - "为了新案例牺牲本章核心概念"
+  - "输出不可运行的实验代码"
+  - "只给公式，不解释其在模型训练中的角色"
+  - "把本章扩展成优化器综述课"
+  - "主 Agent 直接承担所有版式与文件工艺"
+  - "Subagent 直接输出最终文件"
+  - "Skill 自行发明教学内容"
+  - "Quality Review Subagent 既审查又改内容"
+  - "把讲稿文字直接搬到 PPT 页面上"
+  - "一次性展示所有信息，破坏课堂节奏"

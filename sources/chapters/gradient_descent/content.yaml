@@ -1,0 +1,173 @@
+lesson:
+  title: "梯度下降与优化"
+  subtitle: "模型为什么能通过误差学习"
+  audience: "研究生 AI 数学基础补课"
+  duration_minutes: 120
+  learning_outcomes:
+    - "能解释损失函数、梯度、学习率和参数更新之间的关系。"
+    - "能从一维二次函数推导梯度下降更新公式。"
+    - "能通过实验判断学习率过大或过小的训练表现。"
+    - "能说明梯度下降在 AI 模型训练中的作用和边界。"
+  key_message: "梯度把误差转化为参数更新方向，学习率决定每一步更新的尺度。"
+  teacher_verdict:
+    would_teach: true
+    verdict: "会拿去上课，但我会在课前按本班学生背景微调例子和节奏。"
+    reason: "这版已经有清楚主线、可运行实验、误区提醒和评价证据；它不是最终个人风格稿，但足够作为一节研究生补基础课的课堂底稿。"
+  fixed_template:
+    - "讲前判断"
+    - "驱动问题"
+    - "玩具模型"
+    - "核心推导"
+    - "AI 映射"
+    - "课堂实验"
+    - "误区处理"
+    - "课堂检查"
+    - "作业评价"
+    - "课后复盘"
+classroom_timing:
+  - stage: "讲前判断与驱动问题"
+    minutes: 15
+    teacher_action: "用模型犯错的场景引出：参数为什么知道往哪里改？"
+    student_evidence: "学生能说出训练不是记答案，而是反复降低损失。"
+  - stage: "玩具模型建模"
+    minutes: 15
+    teacher_action: "把训练问题压缩成 L(w) = (w - 3)^2 + 1。"
+    student_evidence: "学生能指出 w、L(w)、最低点分别对应什么。"
+  - stage: "核心推导"
+    minutes: 30
+    teacher_action: "板书导数符号、负梯度方向和更新公式。"
+    student_evidence: "学生能计算 w0 = 0, eta = 0.1 的第一步更新。"
+  - stage: "AI 映射"
+    minutes: 20
+    teacher_action: "把一维更新映射到 theta 的训练循环。"
+    student_evidence: "学生能把 loss、gradient、learning rate 放回训练流程。"
+  - stage: "课堂实验"
+    minutes: 25
+    teacher_action: "运行 notebook，对比三个学习率轨迹。"
+    student_evidence: "学生能解释慢、稳、震荡/发散的差异。"
+  - stage: "误区处理与收束"
+    minutes: 15
+    teacher_action: "纠正全局最优、学习率越大越好、梯度等于答案等误解。"
+    student_evidence: "学生能说出本章结论和梯度下降边界。"
+misconceptions:
+  - misconception: "梯度下降一定找到全局最优。"
+    correction: "本章只承诺在局部信息下沿下降方向更新；非凸模型可能遇到局部极小、鞍点或平台区。"
+    teacher_move: "在边界页明确说：今天先理解机制，不承诺完整优化理论。"
+  - misconception: "学习率越大，训练越快。"
+    correction: "学习率是步幅，过大会越过低损失区域，导致震荡或发散。"
+    teacher_move: "让学生先预测 eta=1.05 的轨迹，再运行 notebook。"
+  - misconception: "梯度就是模型最终答案。"
+    correction: "梯度不是答案，而是当前参数处的局部改进方向。"
+    teacher_move: "反复追问：它告诉我们往哪里改，还是告诉我们最终在哪里？"
+  - misconception: "会背更新公式就理解了训练。"
+    correction: "真正理解要能把公式中的 loss、gradient、eta 映射回模型训练。"
+    teacher_move: "要求学生用一句话解释每个符号在训练循环中的角色。"
+in_class_checks:
+  - check: "预测一步更新"
+    prompt: "w0 = 0, eta = 0.1 时，w1 是多少？方向为什么是增大？"
+    expected: "w1 = 0.6，因为当前导数为负，减去负梯度会让 w 增大。"
+  - check: "解释曲线"
+    prompt: "为什么 eta = 0.05 的损失下降更慢？"
+    expected: "每步更新幅度小，方向正确但推进慢。"
+  - check: "诊断失败"
+    prompt: "如果训练损失来回震荡，首先怀疑什么？"
+    expected: "优先检查学习率是否过大，也可进一步检查特征尺度和初始化。"
+teacher_quality_review:
+  total_score: 90
+  pass_threshold: 85
+  verdict: "通过。作为研究生补基础课底稿，我会拿去上课；课前只需要按学生背景补 1 个本专业案例。"
+  scores:
+    teaching_speakable: 18
+    math_trustworthy: 18
+    ai_connection: 19
+    experiment_runnable: 15
+    assessment_valid: 13
+    teacher_editability: 7
+  strengths:
+    - "主线集中，避免把一节课扩展成优化理论综述。"
+    - "一维推导、AI 映射和实验观察能互相支撑。"
+    - "作业能检查解释、计算和实验诊断三类理解证据。"
+  risks:
+    - "如果学生导数基础弱，核心推导阶段需要放慢。"
+    - "PPT 仍偏骨架型，老师上课前最好替换 1-2 个更贴近本专业的训练案例。"
+  repair_actions:
+    - "保留一维二次函数主线，不再额外增加优化器内容。"
+    - "课前确认 notebook 环境能显示中文字体；不能显示时也不影响数学结果。"
+lesson_flow:
+  - stage: "讲前判断"
+    purpose: "确认本节课只解决误差如何变成参数更新方向。"
+    core_content: "学生不是来学优化器大全，而是理解 loss、gradient、learning rate 在训练中的角色。"
+  - stage: "驱动问题"
+    purpose: "用模型犯错后的更新问题打开课堂。"
+    core_content: "loss 只能告诉错得多重，不能直接告诉参数往哪改。"
+  - stage: "玩具模型"
+    purpose: "把训练问题压缩成可画图、可推导的一维二次损失。"
+    core_content: "L(w) = (w - 3)^2 + 1，w 是参数，L(w) 是损失。"
+  - stage: "核心推导"
+    purpose: "从导数符号推到负梯度更新。"
+    core_content: "dL/dw = 2(w - 3)，w_{t+1} = w_t - eta * dL/dw。"
+  - stage: "AI 映射"
+    purpose: "把一维公式映射回多参数模型训练循环。"
+    core_content: "预测、计算损失、求梯度、更新参数、再次预测。"
+  - stage: "课堂实验"
+    purpose: "用三种学习率让学生看见训练动态。"
+    core_content: "eta 过小会慢，合适会收敛，过大会震荡或发散。"
+  - stage: "误区处理"
+    purpose: "防止学生把梯度下降理解成万能最优解。"
+    core_content: "本章只讲局部下降机制，不承诺非凸问题全局最优。"
+  - stage: "课堂检查"
+    purpose: "区分会背公式和真的理解机制。"
+    core_content: "预测一步更新、解释曲线、诊断学习率。"
+  - stage: "作业评价"
+    purpose: "用概念、推导、实验三类证据评价理解。"
+    core_content: "解释题、一步更新计算题、实验诊断题。"
+  - stage: "课后复盘"
+    purpose: "提醒老师观察学生能否把公式说回训练机制。"
+    core_content: "学生能说清 loss、gradient、eta 的角色才算过关。"
+doc_sections:
+  teaching_plan:
+    title: "教案"
+    paragraphs:
+      - "本章面向研究生 AI 数学基础补课，目标是让学生理解模型为什么能通过误差学习。课堂从模型训练问题进入，先建立损失函数与参数更新的直观联系，再用一维二次函数推导梯度下降，最后回到多参数 AI 模型训练循环。"
+      - "建议 120 分钟授课：应用问题导入 15 分钟，数学抽象与推导 35 分钟，模型训练解释 20 分钟，实验 30 分钟，作业讲解与总结 20 分钟。"
+  lecture_script:
+    title: "讲稿"
+    paragraphs:
+      - "今天我们不从公式开始，而从一个模型犯错的问题开始：如果模型输出错了，它如何知道参数应该往哪个方向改？损失函数给出了错得有多严重，梯度则告诉我们怎样改能让损失下降。"
+      - "在一维例子 L(w) = (w - 3)^2 + 1 中，导数 dL/dw = 2(w - 3)。当 w 小于 3 时，导数为负，负梯度方向会让 w 增大；当 w 大于 3 时，导数为正，负梯度方向会让 w 减小。这个方向性正是训练能推进的原因。"
+      - "真实模型的参数不是一个 w，而是一个向量 theta。更新公式 theta = theta - eta * grad L(theta) 是训练循环里的核心骨架。学习率 eta 不是装饰，它决定每次相信梯度多少。"
+  blackboard_plan:
+    title: "板书设计"
+    bullets:
+      - "问题：误差如何指导参数更新？"
+      - "目标函数：L(w) = (w - 3)^2 + 1"
+      - "导数：dL/dw = 2(w - 3)"
+      - "更新：w_{t+1} = w_t - eta * dL/dw"
+      - "推广：theta_{t+1} = theta_t - eta * grad L(theta_t)"
+      - "学习率三种表现：慢、稳、震荡/发散"
+  classroom_questions:
+    title: "课堂提问"
+    items:
+      - question: "如果梯度是正数，为什么更新时要减去梯度？"
+        answer: "梯度指向损失上升最快方向，减去梯度才是沿局部下降方向移动。"
+      - question: "学习率越大是否一定越好？"
+        answer: "不是。学习率过大可能越过低损失区域，引起震荡或发散。"
+      - question: "为什么一维例子能帮助理解神经网络训练？"
+        answer: "它保留了损失、梯度、学习率、参数更新这条训练主线。"
+homework:
+  - type: "概念题"
+    question: "用自己的话解释梯度、负梯度方向和学习率在训练中的作用。"
+    answer: "梯度表示损失对参数变化的敏感方向，负梯度方向是局部降低损失的方向，学习率控制每次沿该方向移动的距离。"
+    rubric: "概念准确 4 分，能连接模型训练 4 分，表达清楚 2 分。"
+  - type: "推导题"
+    question: "给定 L(w) = (w - 3)^2 + 1，推导梯度下降更新公式，并说明 w0 = 0, eta = 0.1 时第一步更新结果。"
+    answer: "dL/dw = 2(w - 3)，w1 = w0 - eta * 2(w0 - 3) = 0 - 0.1 * (-6) = 0.6。"
+    rubric: "导数正确 3 分，更新公式正确 3 分，数值计算正确 2 分，解释方向 2 分。"
+  - type: "实验题"
+    question: "运行 notebook，比较 eta = 0.05、0.2、1.05 的训练轨迹，并解释差异。"
+    answer: "0.05 下降慢，0.2 较快收敛，1.05 会出现震荡或不稳定。学生应结合轨迹和损失曲线说明原因。"
+    rubric: "代码可运行 3 分，图像结果正确 3 分，解释学习率影响 4 分。"
+quality_review:
+  teaching: "课堂路径从问题进入，推导与实验服务于同一教学目标，具备可讲性。"
+  math: "只在局部下降方向和一维/多维更新公式层面承诺，不声称非凸问题必达全局最优。"
+  ai_connection: "持续将损失、梯度、学习率连接到模型训练循环。"
