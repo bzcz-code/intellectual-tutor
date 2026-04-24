@@ -20,5 +20,10 @@ For current planning and implementation decisions:
 
 - use `docs/PRD.md`
 - use the active plan in `plans/`
-- when execution is resumed, start from WSL2 Hermes installation
+- treat WSL2 Hermes installation as completed unless the machine has been reset
+- treat the approved runtime split as:
+  `Ollama` in `WSL2` for low-risk requests, official Hermes memory for summaries, cloud provider for high-risk teaching work
+- treat the current restore point as:
+  finish `ollama pull gemma4:e4b` in `/root/.hermes-intellectual-tutor`, then run `scripts/check_hybrid_inference.py`, then continue to `.env` and WeCom bring-up
+- resume from hybrid routing implementation before broad WeCom rollout unless evidence shows it is already complete
 - do not treat `docs/MVP.md` as the current spec

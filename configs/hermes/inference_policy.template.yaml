@@ -1,0 +1,34 @@
+schema_version: 0.1.0
+
+local_lane:
+  provider: ollama
+  base_url_env: OLLAMA_BASE_URL
+  model_env: LOCAL_FAST_MODEL
+  default_base_url: http://127.0.0.1:11434
+  default_model: gemma4
+  request_classes:
+    - simple_teacher_question
+    - status_explanation
+    - fixed_format_helper_draft
+    - candidate_run_summary
+
+cloud_lane:
+  provider_env: CLOUD_PRIMARY_PROVIDER
+  required_for:
+    - professor_architect_orchestration
+    - lesson_plan_generation
+    - ppt_notebook_teaching_generation
+    - quality_review
+    - source_governance
+    - release_gating
+
+fallback:
+  strategy: upgrade_to_cloud_on_failure_or_uncertainty
+  default_provider: openrouter
+  log_path: logs/hybrid_router_fallback.jsonl
+  required_log_fields:
+    - timestamp
+    - request_class
+    - local_model
+    - fallback_reason
+    - upgrade_provider

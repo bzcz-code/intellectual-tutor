@@ -1,37 +1,64 @@
 reveal_schema:
-  version: 1
-  purpose: "PPT subagent 输出的中间层。它描述课堂揭示顺序，不描述最终版式。"
+  version: 2
+  purpose: "PPT Script Subagent 输出的讲义型中间层协议。它描述课堂讲义页的内容块、程序生成视觉资产和 reveal 顺序，不描述最终坐标。"
   required_slide_fields:
     - slide_id
     - slide_type
     - title
     - teaching_purpose
-    - content
+    - layout
+    - content_blocks
     - reveal_steps
     - notes
     - formula_spec
     - visual_intent
+  required_content_block_fields:
+    - block_id
+    - kind
   required_reveal_step_fields:
     - step_id
     - kind
-    - text
+    - target_ref
   allowed_slide_types:
     - hook
     - conflict
     - insight
-    - intuition
     - formalization
+    - intuition
     - ai_mapping
     - recap
     - exercise
+  allowed_layouts:
+    - title_overview
+    - two_column
+    - diagram_explanation
+    - formula_lab
+    - code_result
+  allowed_content_kinds:
+    - paragraph
+    - bullet_list
+    - diagram
+    - plot
+    - code_block
+    - output_block
+    - formula
+    - callout
   allowed_reveal_kinds:
+    - paragraph
+    - bullet_list
+    - diagram
+    - plot
+    - code_block
+    - output_block
+    - formula
+    - callout
     - question
     - idea
-    - formula
     - mapping
     - check
   invariants:
-    - "slide script 不包含坐标、字体、颜色、具体版式名称。"
-    - "slide script 只描述教学意图、揭示步骤、公式和视觉意图。"
-    - "ppt skill 不得新增教学内容，只能呈现 slide script 已有内容。"
-    - "公式必须放在 formula_spec 中，reveal_steps 只能引用或解释公式。"
+    - "slide script 不包含最终坐标、字体、颜色或具体版式尺寸。"
+    - "slide script 可以描述讲义页内容块、视觉意图、程序生成资产引用和 reveal 顺序。"
+    - "ppt skill 不得新增教学结论，只能呈现 slide script 已有内容或生成其引用的确定性图表。"
+    - "公式必须放在 formula_spec 中，content_blocks 和 reveal_steps 只能引用或解释公式。"
+    - "代码块必须短小、可课堂展示，输出块必须说明学生应观察到的现象。"

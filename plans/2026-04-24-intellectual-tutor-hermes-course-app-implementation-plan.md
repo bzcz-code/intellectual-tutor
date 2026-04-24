@@ -2,38 +2,127 @@
 
 ## Objective
 
-基于新的 PRD，把 `D:\Codex_Project\intellectual_tutor` 从“本地单章生成脚本仓库”升级为：
+Upgrade `D:\Codex_Project\intellectual_tutor` from a local single-chapter generation repository into:
 
-- 一个运行在官方 `Hermes Agent` 之上的课程备课 app。
-- 使用官方 `WeCom` adapter 作为教师入口。
-- 支持“生成上课包 + 查询状态 + 提修改 + 二次确认后重生成”的 v1 教师闭环。
+- a course-prep app that runs on top of the official `Hermes Agent`
+- a course instance that uses the official `WeCom` callback adapter as the teacher entry point
+- a v1 teacher loop covering generate package, query status, propose change, explicit confirmation, and regeneration
 
-本计划明确废弃“自建 Hermes runtime / 自建消息网关 / 自建记忆系统”路线。
+This plan explicitly rejects the earlier wrong route of building a separate Hermes runtime, memory system, or messaging gateway inside this repository.
 
 ## Current Execution Pointer
 
 The repository-side course-app scaffolding is already in place.
 
-When continuing this plan, do not restart from early repo-internal scaffolding tasks unless the repository has been reset.
+When continuing this plan, do not restart from early repo-internal scaffolding tasks or from initial WSL2/Hermes installation unless the machine has been reset.
 
 The next execution slice is:
 
-1. install the official `Hermes Agent` inside `WSL2`
-2. initialize a dedicated `HERMES_HOME`
-3. mount this repository into Hermes as the course app
-4. verify Hermes can load the repo skills and prompt templates
-5. continue into WeCom callback setup and end-to-end smoke testing
+1. implement the approved hybrid local/cloud inference policy in docs, templates, and runtime wiring
+2. install and validate `Ollama` inside `WSL2` for the dedicated Hermes instance
+3. use `gemma4` as the local low-cost lane for:
+   simple questions, status explanations, fixed-format helper drafts, and candidate run summaries
+4. keep official Hermes memory, `memory` tool, and `session_search` as the only built-in memory/summary path
+5. keep a live cloud provider for:
+   `Professor Architect Agent`, core subagent generation, `quality_review`, source governance, and release gating
+6. auto-upgrade local failures or uncertainty to the cloud lane and log the local miss
+7. after the hybrid lane is validated, continue with live cloud credentials and WeCom callback secrets in `$HERMES_HOME/.env`
+8. resume the WeCom callback endpoint validation and end-to-end smoke test
+
+Current default resume point:
+
+1. open `Ubuntu-24.04` in `WSL2` as `root`
+2. export `HERMES_HOME=/root/.hermes-intellectual-tutor`
+3. verify `ollama.service` is running and retry `ollama pull gemma4:e4b`
+4. stop only when `ollama list` shows `gemma4:e4b`
+5. run the repo-side smoke check:
+   `python3 /mnt/d/Codex_Project/intellectual_tutor/scripts/check_hybrid_inference.py --hermes-home /root/.hermes-intellectual-tutor`
+6. if that passes, move directly into `$HERMES_HOME/.env` cloud-provider and WeCom secret configuration
 
 Primary references:
 
+- `docs/PRD.md`
 - `docs/deployment/hermes-wsl2-setup.md`
 - `docs/deployment/wecom-setup.md`
 - `scripts/bootstrap_hermes_course_app.py`
 
 Rule for new sessions:
 
-- If the user says "继续完成计划", start with WSL2 Hermes installation.
+- If the user says "continue the plan" or "继续完成计划", start from hybrid routing implementation on top of the existing WSL2 Hermes install.
 - Do not restart from M1 document scaffolding unless files are missing.
+
+## Execution Update 2026-04-24
+
+Completed in prior execution:
+
+- installed `WSL2` distro `Ubuntu-24.04`
+- verified `WSL2` entry with `root`, kernel visibility, and repo mount at `/mnt/d/Codex_Project/intellectual_tutor`
+- installed the official `Hermes Agent` into `/root/.hermes-intellectual-tutor/hermes-agent`
+- initialized dedicated `HERMES_HOME=/root/.hermes-intellectual-tutor`
+- ran `scripts/bootstrap_hermes_course_app.py` inside `WSL2`
+- verified `config.yaml` contains `skills.external_dirs: /mnt/d/Codex_Project/intellectual_tutor/skills`
+- verified Hermes can see the repo skill `intellectual-tutor-course-workflow`
+
+Completed in this session:
+
+- confirmed with the user that cost control should use a hybrid inference split
+- fixed the local deployment target to `Ollama` inside the same `WSL2` environment as the dedicated Hermes instance
+- fixed the default local model target to `gemma4`
+- fixed the first local lane scope to:
+  simple questions, status explanations, fixed-format helper drafts, and candidate run summaries
+- fixed the fallback rule to:
+  auto-upgrade local failures or uncertainty to the cloud lane and log the local miss
+- fixed the summary/memory rule to:
+  keep official Hermes `memory` and `session_search` as the only built-in memory path, with no repo-local clone
+- rewrote the opening of `docs/PRD.md` to state the final product goal, core use scenarios, and core product functions explicitly, so new sessions do not read the repo as only a vague single-chapter generator
+- aligned the root `README.md` opening summary with the updated PRD so the repository entry point now states the final product as a teacher copilot with WeCom entry, dialogue revision, confirmed preference learning, and cross-chapter continuity
+- pushed the hybrid-routing boundary into the runtime-facing repo files:
+  `configs/hermes/SOUL.template.md`, `agents/course-app/ProfessorArchitectAgent.md`, and `skills/course/intellectual-tutor-course-workflow/SKILL.md`
+- added `configs/hermes/inference_policy.template.yaml` and updated `scripts/bootstrap_hermes_course_app.py` to materialize it into the dedicated `HERMES_HOME`
+- added `scripts/check_hybrid_inference.py` so the local lane and fallback-log behavior can be smoke-tested from `WSL2`
+- updated `docs/deployment/hermes-wsl2-setup.md` with the repo-specific `Ollama` install and hybrid-lane verification steps
+- bootstrapped `/root/.hermes-intellectual-tutor` again so the live instance now includes:
+  `SOUL.md` with routing policy and `intellectual_tutor_inference_policy.yaml`
+- installed `Ollama 0.21.1` inside `Ubuntu-24.04`, created `/etc/systemd/system/ollama.service`, and verified the service binds `127.0.0.1:11434`
+- initialized `AGENT.md` and rewrote `AGENTS.md` so both now point at the current plan-driven resume workflow instead of the earlier stale WSL2/Hermes install pointer
+- expanded `AGENTS.md` into a real repository orientation document with:
+  read order, layered project map, key entry scripts, key Hermes tools, task-to-file routing, and the default concrete example path under `gradient_descent`
+
+Remaining work:
+
+- validate `gemma4:e4b` pull completion in `WSL2`
+- run `scripts/check_hybrid_inference.py` against the dedicated `HERMES_HOME`
+- verify automatic fallback logging
+- configure live cloud-provider access in `$HERMES_HOME/.env`
+- configure WeCom callback secrets in `$HERMES_HOME/.env`
+- start the Hermes gateway and verify callback binding
+- run the first allowed-user WeCom smoke test
+- capture callback and smoke-test evidence for later handoff
+
+Current blockers and assumptions:
+
+- the hybrid routing design is now wired into repo templates and smoke-check tooling, but the first local-model pull is not complete yet
+- a live cloud provider is still required for high-risk teaching tasks even after the local lane is added
+- the local lane must stay outside `lesson_plan`, `quality_review`, source governance, and release gating
+- official Hermes memory behavior remains the source of truth for long-term summaries and session recall
+- the dedicated runtime should continue using `/root/.hermes-intellectual-tutor` unless the machine setup changes
+- current blocker on the machine:
+  `ollama pull gemma4:e4b` is failing at the registry/manifest stage with network timeouts such as
+  `Get "https://registry.ollama.ai/v2/library/gemma4/manifests/e4b": dial tcp 198.18.0.201:443: i/o timeout`
+- until `ollama list` shows `gemma4:e4b`, do not advance to `.env` credential wiring or WeCom callback validation
+
+Verification evidence already captured:
+
+- `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'whoami && uname -a && python3 --version'`
+- `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'export HERMES_HOME=/root/.hermes-intellectual-tutor; curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash -s -- --skip-setup --hermes-home /root/.hermes-intellectual-tutor'`
+- `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'export HERMES_HOME=/root/.hermes-intellectual-tutor; /root/.hermes-intellectual-tutor/hermes-agent/venv/bin/python /mnt/d/Codex_Project/intellectual_tutor/scripts/bootstrap_hermes_course_app.py --hermes-home /root/.hermes-intellectual-tutor'`
+- `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'export HERMES_HOME=/root/.hermes-intellectual-tutor; /root/.local/bin/hermes skills list'`
+- `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'export HERMES_HOME=/root/.hermes-intellectual-tutor; /root/.local/bin/hermes doctor'`
+- `python -m py_compile scripts/bootstrap_hermes_course_app.py scripts/check_hybrid_inference.py`
+- `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'cd /mnt/d/Codex_Project/intellectual_tutor && python3 scripts/bootstrap_hermes_course_app.py --hermes-home /root/.hermes-intellectual-tutor --overwrite-soul'`
+- `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'curl -fsSL https://ollama.com/install.sh | sh'` followed by the explicit install/retry path with `zstd`, service creation, and `systemctl enable ollama`
+- `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'curl -fsS http://127.0.0.1:11434/api/tags'`
+- `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'journalctl -u ollama -n 80 --no-pager'`
 
 ## Progress Synchronization Protocol
 
@@ -66,71 +155,64 @@ Do not rely on chat history as the only handoff mechanism.
 - `M4 Course Agent And Subagent Setup`: repo-side skeleton completed
 - `M5 Run Layout And Release Chain`: completed for local run-based workflow
 - `M6 Teacher Change Loop`: completed for local workflow, including structured and legacy compatibility plus PPT regeneration sync
-- `M7 WeCom End-to-End Integration`: not started
-- `M8 Regression And Local Operations`: partially prepared in docs, not completed as a live deployed system
+- `M6.5 Hybrid Inference Cost-Control Lane`: approved in design, not yet implemented
+- `M7 WeCom End-to-End Integration`: in progress; WSL2 distro, official Hermes install, dedicated `HERMES_HOME`, and repo-skill mounting are verified, but hybrid routing, callback secrets, and live message-path testing are still pending
+- `M8 Regression And Local Operations`: partially prepared in docs and in the live machine environment, but not completed as a verified deployed system
 
 ## Fixed Architecture
 
 ### Official Hermes Core
 
-外部依赖，不在本仓库中重造：
+External to this repository:
 
-- Memory / summary / cleanup
-- Session / gateway / adapter framework
-- Agent runtime
-- Tool calling and subagent orchestration
+- memory, summary, and cleanup mechanisms
+- session and adapter framework
+- agent runtime
+- tool calling and subagent orchestration
 
 ### Intellectual Tutor Course App
 
-本仓库负责：
+Owned by this repository:
 
-- 课程主 agent 与 subagent 配置
-- 课程 workflow contracts
-- 章节生成与审查工具
-- WeCom 对接说明
-- 本机 WSL2 部署说明
+- course agent and subagent prompts
+- workflow contracts
+- chapter generation and review tools
+- WeCom deployment guidance
+- local WSL2 deployment guidance
+- inference routing policy for local vs cloud lanes
 
 ### WeCom Entry
 
-第一版固定使用官方 Hermes `WeCom` adapter，不自建新的聊天入口框架。
+The first version uses the official Hermes `WeCom` adapter directly. This repo does not implement a custom chat gateway.
+
+### Hybrid Inference Lane
+
+The approved cost-control lane is:
+
+- official Hermes memory, `memory` tool, and `session_search` remain the built-in summary and recall system
+- local `Ollama + gemma4` in `WSL2` serves low-risk requests
+- a live cloud provider remains required for high-risk teaching generation and review
 
 ## Milestones
 
 ### M1. Hermes Integration Skeleton
 
-目标：先把本仓库变成“可被 Hermes 挂载的课程 app”，而不是继续直接跑裸脚本。
+Goal: define the repository as a Hermes-loadable course app instead of a standalone script runner.
 
-交付物：
+Delivered:
 
 - `docs/deployment/hermes-wsl2-setup.md`
 - `docs/deployment/wecom-setup.md`
 - `docs/architecture/course-app-overview.md`
-- `configs/hermes/` 下的 app 配置草案
-- `skills/` 或 Hermes 要求的课程 skill 目录骨架
-- `agents/` 或 Hermes 要求的主 agent / subagent prompt 骨架
-
-任务：
-
-1. 研究并固定官方 Hermes 本地接入方式
-2. 定义本仓库的 Hermes 挂载目录结构
-3. 把当前课程能力映射为：
-   - SOUL / persona
-   - main agent
-   - subagents
-   - skills
-   - tools
-4. 明确 Windows 路径到 WSL2 路径的访问约束
-
-验收：
-
-- 可以清楚回答“本仓库中的哪些文件会被 Hermes 直接加载”
-- 可写出一套最小 Hermes 接入目录，不再依赖口头约定
+- `configs/hermes/` templates
+- `skills/` course skill skeleton
+- `agents/` course prompt skeleton
 
 ### M2. Workflow Contract Refactor
 
-目标：把当前脚本链重构成 Hermes 友好的结构化 contracts。
+Goal: express the chapter workflow through structured contracts instead of informal script coupling.
 
-交付物：
+Delivered:
 
 - `schemas/course/lesson_plan.yaml`
 - `schemas/course/ppt_script.yaml`
@@ -140,23 +222,11 @@ Do not rely on chat history as the only handoff mechanism.
 - `schemas/course/change_request.yaml`
 - `schemas/course/change_confirmation.yaml`
 
-任务：
-
-1. 把现有 `content.yaml` 升级为节点化 `lesson_plan` contract
-2. 把 PPT contract 与 notebook contract 从脚本实现中抽离
-3. 明确 teacher summary / release manifest / review contracts
-4. 让所有关键治理链都携带 `run_id`
-
-验收：
-
-- 所有主要 workflow 输入输出都能用结构化文件描述
-- 主 agent、subagent、tool 的接口边界可以直接落到文件和 schema 上
-
 ### M3. Toolization Of Existing Generators
 
-目标：把当前 Python 脚本从“自由入口脚本”重构成可被 Hermes 调用的 course tools。
+Goal: refactor the existing Python generation path into Hermes-callable course tools.
 
-交付物：
+Delivered:
 
 - `tools/lesson_plan_builder.py`
 - `tools/ppt_designer.py`
@@ -166,150 +236,78 @@ Do not rely on chat history as the only handoff mechanism.
 - `tools/status_reader.py`
 - `tools/change_applier.py`
 
-任务：
-
-1. 拆分 `scripts/generate_chapter.py` 的 orchestration 责任
-2. 把 `lesson_planner.py` 中 notebook 逻辑独立出来
-3. 把 `ppt_skill.py`、`verify_outputs.py` 重命名并改造成 tool 风格接口
-4. 统一 tool 的输入输出为：
-   - structured input path
-   - output root
-   - structured result
-
-验收：
-
-- 不再存在一个“大一统脚本”承担所有生成逻辑
-- 每个 tool 都有清晰输入、输出、职责和失败语义
-
 ### M4. Course Agent And Subagent Setup
 
-目标：把课程 workflow 真正定义成 Hermes 可运行的 agent 体系。
+Goal: define the course workflow as a Hermes agent system with clear role boundaries.
 
-交付物：
+Delivered:
 
-- 课程 SOUL / persona
-- `Professor Architect Agent` prompt
-- `PPT Script Subagent` prompt
-- `Notebook Lab Subagent` prompt
-- `Quality Review Subagent` prompt
-- `Source Curator Subagent` prompt
-- 对应 skill 配置
-
-任务：
-
-1. 把新 PRD 中的职责边界转成 prompt / policy / skill 规则
-2. 把写入类请求必须二次确认的规则固化进 agent 行为
-3. 把“教学内容可改、课程基线不可改”的权限边界写进 course app
-4. 把来源治理与 override 规则写进 review 和 source 子链
-
-验收：
-
-- 可以回答每个修改动作由谁决策、谁转译、谁执行
-- agent 不直接越权生成最终文件或绕过确认流程
+- course persona and prompt structure
+- `Professor Architect Agent`
+- `PPT Script Subagent`
+- `Notebook Lab Subagent`
+- `Quality Review Subagent`
+- `Source Curator Subagent`
 
 ### M5. Run Layout And Release Chain
 
-目标：建立和新 PRD 一致的运行产物目录与发布链。
+Goal: establish run-based outputs and release artifacts aligned with the PRD.
 
-交付物：
+Delivered:
 
-- `outputs/runs/<chapter>/<run_id>/...` 目录规范
+- `outputs/runs/<chapter>/<run_id>/...`
 - `review/summary/teacher_summary.md`
 - `release_manifest.yaml`
 - `source_bundle/debug_index.md`
 
-任务：
-
-1. 引入 `run_id` 贯穿所有关键产物
-2. 改造输出目录为 run-based layout
-3. 增加 `teacher_summary`、`release_manifest`、debug index
-4. 区分 release / review / source bundle
-
-验收：
-
-- 多次运行不会互相覆盖
-- 老师端回传、调试、回归都能定位到具体 `run_id`
-
 ### M6. Teacher Change Loop
 
-目标：实现教师修改摘要与确认闭环。
+Goal: support propose-change, summarize-change, confirm-change, and scope-aware regeneration.
 
-交付物：
+Delivered:
 
 - `change_request.yaml`
 - `change_summary.md`
 - `change_confirmation.yaml`
-- 影响范围判断逻辑
+- impact-scope regeneration logic
 
-任务：
+### M6.5 Hybrid Inference Cost-Control Lane
 
-1. 解析自然语言修改为结构化变更请求
-2. 生成自然语言变更摘要
-3. 等待明确确认词
-4. 按影响范围重跑：
-   - lesson plan only
-   - ppt regeneration
-   - notebook regeneration
-   - full review
+Goal: reduce cloud cost while keeping high-risk teaching reasoning on the cloud lane.
 
-验收：
+Remaining deliverables:
 
-- 老师提出修改时系统不会直接改文件
-- 未确认前不会触发真正的重生成
+- WSL2-side `Ollama` deployment notes
+- local env/config template entries
+- first low-risk routing rules
+- fallback logging behavior
+- smoke-test evidence for local lane plus cloud fallback
 
 ### M7. WeCom End-to-End Integration
 
-目标：接通官方 Hermes WeCom adapter 与课程 app。
+Goal: connect the official Hermes WeCom callback adapter to the course app.
 
-交付物：
+Remaining deliverables:
 
-- WeCom 环境变量与配置清单
-- 本机回调接入说明
-- WeCom smoke test 说明
-- 教师交互示例脚本
-
-任务：
-
-1. 配置 Hermes WeCom callback
-2. 验证 WeCom 到 Hermes 的消息链路
-3. 让课程 app 接住以下意图：
-   - generate package
-   - query status
-   - propose change
-   - confirm change
-4. 验证附件回传与超限降级
-
-验收：
-
-- 企业微信可以触发一轮真实生成
-- 老师能收到摘要、状态和关键附件
+- WeCom environment variables and callback config
+- local callback setup instructions exercised against the live machine
+- WeCom smoke-test evidence
+- teacher interaction examples through the live channel
 
 ### M8. Regression And Local Operations
 
-目标：让这套系统在当前电脑上可稳定重复运行。
+Goal: make the deployed system repeatable on the current machine.
 
-交付物：
+Remaining deliverables:
 
-- 本机启动命令清单
-- 日志与诊断说明
-- e2e smoke test 文档
-- 回归测试说明
-
-任务：
-
-1. 增加本机启动顺序说明
-2. 增加 WSL2 / Windows 路径协同说明
-3. 增加黄金样例回归脚本或手册
-4. 增加常见故障排查
-
-验收：
-
-- 关闭 IDE 后，环境可重新恢复
-- 关键链路有明确的 smoke test
+- local startup command list
+- logging and diagnosis notes
+- end-to-end smoke-test writeup
+- regression checklist and common-failure guidance
 
 ## Recommended Build Order
 
-推荐按以下顺序推进：
+Proceed in this order:
 
 1. `M1 Hermes Integration Skeleton`
 2. `M2 Workflow Contract Refactor`
@@ -317,29 +315,45 @@ Do not rely on chat history as the only handoff mechanism.
 4. `M4 Course Agent And Subagent Setup`
 5. `M5 Run Layout And Release Chain`
 6. `M6 Teacher Change Loop`
-7. `M7 WeCom End-to-End Integration`
-8. `M8 Regression And Local Operations`
+7. `M6.5 Hybrid Inference Cost-Control Lane`
+8. `M7 WeCom End-to-End Integration`
+9. `M8 Regression And Local Operations`
 
 ## Immediate Next Slice
 
-当前最值得立刻开工的不是重新做 `M1` 文档骨架，而是进入系统集成阶段的第一步：`WSL2 official Hermes installation`。
+The immediate next slice is no longer `WSL2 official Hermes installation`.
 
-具体执行顺序是：
+That installation path is complete enough to move into hybrid routing implementation and then live integration.
 
-1. 在当前电脑的 `WSL2` 中确认 Python 3.11、`uv` 和 repo 挂载路径可用
-2. 按 `docs/deployment/hermes-wsl2-setup.md` 安装官方 `Hermes Agent`
-3. 创建专用 `HERMES_HOME`
-4. 运行 `scripts/bootstrap_hermes_course_app.py` 生成该实例需要的 `SOUL.md`、`.env` 和 `config.yaml`
-5. 在 WSL2 中启动 Hermes，并验证它能看到本仓库的 external skills
-6. 然后进入 `WeCom` callback 配置和 smoke test
+Execute the next slice in this order:
 
-只有这一步完成后，后面的真实 WeCom 联调和端到端交付才算进入可运行状态。
+1. retry `ollama pull gemma4:e4b` until the local model is fully available in `WSL2`
+2. run `python3 /mnt/d/Codex_Project/intellectual_tutor/scripts/check_hybrid_inference.py --hermes-home /root/.hermes-intellectual-tutor`
+3. confirm that the fallback-log probe writes under `/root/.hermes-intellectual-tutor/logs/hybrid_router_fallback.jsonl`
+4. then open `/root/.hermes-intellectual-tutor/.env` inside `WSL2`
+5. provide the live cloud-model credentials needed for high-risk Hermes responses
+6. provide `WECOM_CALLBACK_CORP_ID`, `WECOM_CALLBACK_CORP_SECRET`, `WECOM_CALLBACK_AGENT_ID`, `WECOM_CALLBACK_TOKEN`, and `WECOM_CALLBACK_ENCODING_AES_KEY`
+7. optionally set `WECOM_CALLBACK_ALLOWED_USERS` for bring-up safety
+8. start `hermes gateway run` or `hermes gateway start` with `HERMES_HOME=/root/.hermes-intellectual-tutor`
+9. verify the callback endpoint can be reached and validated by WeCom
+10. send the first allowed-user text message through WeCom and confirm Hermes receives and replies
+
+Resume command bundle for the next session:
+
+```bash
+wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'export HERMES_HOME=/root/.hermes-intellectual-tutor; systemctl is-active ollama; /usr/local/bin/ollama pull gemma4:e4b; /usr/local/bin/ollama list'
+wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'export HERMES_HOME=/root/.hermes-intellectual-tutor; python3 /mnt/d/Codex_Project/intellectual_tutor/scripts/check_hybrid_inference.py --hermes-home "$HERMES_HOME"'
+```
+
+Only after this slice is verified should the plan advance to broader WeCom smoke coverage and local operations hardening.
 
 ## Anti-patterns
 
-- 在本仓库里继续自建 Hermes runtime
-- 让企业微信回调直接调用 `generate_chapter.py`
-- 把课程 app 做成新的通用智能体底座
-- 继续把 notebook 逻辑留在主 agent 中
-- 没有 `run_id` 与 release chain 就先做聊天闭环
-- 同时维护 Hermes 编排和本仓库外挂编排两套 runtime
+- rebuilding Hermes runtime inside this repository
+- rebuilding a repo-local memory or summary system that duplicates official Hermes
+- letting the WeCom callback call `generate_chapter.py` directly
+- turning the course app into a new general-purpose agent platform
+- collapsing notebook logic back into the top-level agent
+- letting the local model become the primary teaching generator
+- skipping `run_id`-based release governance before chat-loop testing
+- maintaining two parallel runtimes for Hermes orchestration and repo-local orchestration

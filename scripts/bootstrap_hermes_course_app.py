@@ -79,9 +79,15 @@ def main() -> None:
     soul_template = ROOT / "configs" / "hermes" / "SOUL.template.md"
     env_template = ROOT / "configs" / "hermes" / "env.template"
     config_template = ROOT / "configs" / "hermes" / "config.template.yaml"
+    inference_policy_template = ROOT / "configs" / "hermes" / "inference_policy.template.yaml"
 
     ensure_file_from_template(hermes_home / "SOUL.md", soul_template, overwrite=args.overwrite_soul)
     ensure_file_from_template(hermes_home / ".env", env_template, overwrite=args.overwrite_env)
+    ensure_file_from_template(
+        hermes_home / "intellectual_tutor_inference_policy.yaml",
+        inference_policy_template,
+        overwrite=False,
+    )
 
     existing_config_path = hermes_home / "config.yaml"
     config = load_yaml(existing_config_path) if existing_config_path.exists() else {}
@@ -94,6 +100,7 @@ def main() -> None:
     print(f"- soul: {hermes_home / 'SOUL.md'}")
     print(f"- env: {hermes_home / '.env'}")
     print(f"- config: {existing_config_path}")
+    print(f"- inference_policy: {hermes_home / 'intellectual_tutor_inference_policy.yaml'}")
     print(f"- external_skills_dir: {args.skills_dir}")
 
 

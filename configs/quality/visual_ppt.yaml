@@ -1,40 +1,56 @@
 visual_ppt:
   role: "PPT skill"
-  purpose: "读取 slide script，应用高级简约模板、公式排版、分步 reveal 和统一版式，输出最终 PPTX。"
+  purpose: "读取讲义型 slide script，稳定生成图文并茂、可课堂讲授也可课后复习的 PPTX。"
   boundary:
-    - "不自行发明教学内容。"
+    - "不自行发明 lesson plan 之外的教学结论。"
     - "不改变 lesson planner 的教学顺序。"
-    - "不让 agent 直接输出最终版式。"
+    - "不使用未审核的外部素材。"
+    - "图表、代码结果和结构图只服务当前章节的核心数学概念。"
   template:
-    name: "minimal_academic_keynote"
-    style: "高级简约科研汇报"
-    background: "warm_off_white"
+    name: "lecture_handout"
+    style: "教材型/讲义型大学课堂课件"
+    background: "clean_white"
     typography:
       title: "Microsoft YaHei"
       body: "Microsoft YaHei"
+      code: "Consolas"
       formula: "Cambria Math"
     layout_principles:
-      - "每页只表达一个核心认知点。"
-      - "内容不超过页面 50%，保留大面积留白。"
-      - "标题负责提问或收束，不承担长解释。"
-      - "公式居中，符号解释进入讲者备注。"
-      - "同一逻辑页的 reveal 通过物理页展开，保证放映时逐步揭示。"
+      - "允许同一页包含核心解释、公式、图表、代码或运行结果。"
+      - "优先使用双栏或三段式布局：左侧讲原理，右侧放结构图、曲线图、代码或输出。"
+      - "页面文本应足以支持课后复习，但每个段落保持短句和清晰层级。"
+      - "公式必须配符号解释或训练语境说明，避免只给孤立公式。"
+      - "代码示例应短小、可运行，并展示关键输出或观察结论。"
+      - "reveal 优先使用 PPT 原生动画；若动画注入失败，允许回退为物理页 reveal。"
   slide_type_rendering:
-    hook: "center_question"
-    conflict: "two_column_tension"
-    insight: "center_highlight"
-    intuition: "two_column_analogy"
-    formalization: "formula_stage"
-    ai_mapping: "process_mapping"
-    recap: "center_highlight"
-    exercise: "center_question"
-  animation_rule: "用 reveal_steps 生成逐步揭示；每一步展开为一张物理页。"
+    hook: "title_overview"
+    conflict: "two_column"
+    insight: "diagram_explanation"
+    intuition: "diagram_explanation"
+    formalization: "formula_lab"
+    ai_mapping: "diagram_explanation"
+    recap: "two_column"
+    exercise: "code_result"
+  animation_rule: "优先对 reveal_steps 指向的内容块注入 PPT 原生出现动画；验证失败时回退为物理页逐步揭示。"
+  generated_assets:
+    - id: "loss_curve"
+      kind: "plot"
+      description: "一维二次损失函数与当前位置切线/下降方向。"
+    - id: "learning_rate_trajectories"
+      kind: "plot"
+      description: "不同学习率下的参数轨迹和损失下降曲线。"
+    - id: "training_loop"
+      kind: "diagram"
+      description: "预测、计算损失、求梯度、更新参数的训练闭环。"
+    - id: "parameter_update"
+      kind: "diagram"
+      description: "loss、gradient、eta 到参数更新的映射关系。"
   quality_score:
     pass_threshold: 88
     dimensions:
-      visual_simplicity: 20
-      teaching_rhythm: 20
-      reveal_quality: 20
-      cognitive_guidance: 20
-      formula_clarity: 10
-      classroom_usability: 10
+      content_self_contained: 20
+      visual_explanation: 20
+      code_result_clarity: 15
+      formula_clarity: 15
+      teaching_rhythm: 15
+      classroom_usability: 15

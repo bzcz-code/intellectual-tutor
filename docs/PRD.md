@@ -2,30 +2,59 @@
 
 ## 1. Product Identity
 
-`Intellectual Tutor` 是一个运行在官方 `Hermes Agent` 之上的课程备课 app，面向讲授 AI 课程群的大学教师，帮助教师围绕单章主题稳定生成高质量上课包，并通过企业微信完成查询、修改、确认和重生成闭环。
+`Intellectual Tutor` 的最终产品目标是：成为一个运行在官方 `Hermes Agent` 之上的大学课程备课与连续跟进 copilot，面向讲授《人工智能数学基础》课程簇的大学教师，重点解决“课件老旧、概念难讲清、备课成本高、章节衔接弱”这四类核心痛点。
 
-本产品不是 Hermes 本体，也不是新的通用智能体框架；它是一个专用于课程备课的 Hermes 垂直应用。
+产品默认入口是 `企业微信`。老师通过自然语言下达任务，例如“帮我生成随机过程的课件”，系统自动理解教学主题、课程上下文与教师偏好，调用 `Professor Architect Agent`、subagent、skill 和 tool，生成可直接用于上课的一整套课程包，并支持后续按对话持续修改、确认、重生成和跨章节跟进。
 
-第一阶段聚焦《人工智能数学基础》课程，首个黄金样例是“梯度下降与优化”。
+本产品不是 Hermes 本体，也不是新的通用智能体框架；它是一个专用于大学教师课程备课与课程连续服务的 Hermes 垂直应用。它也不是自动授课系统，目标是成为教师的备课、修改、复盘和后续章节衔接副驾驶。
 
-核心目标不是替代教师授课，而是成为教师的备课与复盘副驾驶：
+### 1.1 Final Product Goal
 
-- 用真实 AI 训练问题牵引学生理解数学抽象。
-- 帮助教师组织一章课的教学目标、讲解路径、实验和评价。
-- 沉淀可复用课程资产，支持后续迁移到机器学习、深度学习、大模型基础等课程。
+最终产品要做到：
 
-第一版目标用户：
+- 让老师在 `企业微信` 中一句话发起备课任务，而不是手工拆解 PPT、讲稿、代码和作业。
+- 默认围绕单章主题生成完整课程包，同时维护整门课的上下文，支持下一章继续衔接。
+- 用真实 AI 应用问题牵引学生理解数学抽象，再落到模型解释、实验验证和作业评价。
+- 让老师可以直接在对话里提出修改意见，系统先给出变更摘要，确认后按影响范围重生成。
+- 逐步总结教师的表达习惯、板书偏好、案例偏好和作业风格，在教师确认后沉淀为长期画像。
+- 为后续整门课程连续服务做准备，包括根据课堂进度、课堂反馈和后续章节安排持续生成新的课程包。
 
-- 讲授《人工智能数学基础》《机器学习数学基础》《AI 导论数学模块》的大学教师。
+### 1.2 Core Use Scenarios
+
+最终产品的核心使用场景固定为：
+
+- 新课备课：老师说“帮我生成随机过程的课件”，系统生成该章节的完整课程包。
+- 旧课翻新：老师提供旧 PPT、旧讲稿或旧教案，系统在保留课程主线和教师风格的前提下重构整套材料。
+- 对话修改：老师在企业微信里说“案例换成排队系统”“把公式推导讲慢一点”“增加一个可调参数曲线演示”，系统汇总影响、等待确认，再局部重生成。
+- 跨章节跟进：老师完成上一章授课后，补充本节进度、学生难点和临时增补内容，系统在下一章生成时自动继承这些上下文。
+- 教学团队沉淀：课程负责人希望把一门课持续积累为可复用资产库，而不是每学期重新拼材料。
+
+### 1.3 Core Product Functions
+
+最终产品需要实现的核心功能固定为：
+
+- 课程包生成：生成高质量 `PPT`、讲稿/教案、板书设计、代码实验、作业、答案与评分标准。
+- 动态教学表达：在课件和实验中生成案例、动图、可调参数曲线、实验观察点和概念桥接内容。
+- 结构化中间稿治理：产出 `lesson_plan.yaml`、`ppt_script.yaml`、`notebook_script.yaml`、`quality_review.yaml`、`release_manifest.yaml` 等结构化文件，保证可审查、可追踪、可复用。
+- 对话式修改闭环：支持查询状态、提出修改、接收变更摘要、确认后重生成，并按影响范围局部重跑。
+- 教师画像沉淀：从历史对话和修改中总结候选偏好，经教师确认后更新 `profile.yaml`，用于后续生成。
+- 跨会话课程连续性：保存当前学科、最近章节上下文、待确认修改、最近运行结果和最近审查状态，服务后续章节。
+- 质量与来源治理：对教学逻辑、数学可信度、AI 场景连接和来源可信链进行审查，不允许无依据生成核心教学内容。
+
+第一阶段聚焦《人工智能数学基础》课程，课程簇范围包括矩阵、凸优化、概率统计、随机过程等与 AI 教学强相关的数学主题。
+
+默认目标用户：
+
+- 讲授《人工智能数学基础》《机器学习数学基础》《AI 导论数学模块》等课程的大学教师。
 - 首次开课或需要重构课程材料的青年教师。
-- 负责 AI 课程群建设、需要沉淀课程资产的教学团队。
+- 负责 AI 课程群建设、需要沉淀可复用课程资产的教学团队。
 
 默认教学定位：
 
 - 面向研究生补基础。
 - 中文主讲，保留关键英文术语。
-- 应用驱动加理解数学抽象。
-- 不是纯数学体系课，也不是工具使用课。
+- 应用问题驱动数学理解，而不是只讲抽象公式。
+- 不是纯数学体系课，也不是纯工具操作课。
 
 ## 2. System Boundary
 
@@ -100,6 +129,19 @@
 - WeCom 配置说明仓库。
 
 本仓库不是官方 Hermes 源码镜像，不 vendor 官方 Hermes 本体。
+
+### 3.4 Hybrid Inference And Cost Control
+
+The v1 deployment may use a hybrid inference split to reduce cloud-model cost without moving core teaching decisions onto a local model.
+
+Approved baseline:
+
+- run the official `Hermes Agent` in `WSL2`
+- run `Ollama` in the same `WSL2` environment for low-latency local calls
+- use a local `gemma4` model as the default low-cost lane for simple questions and bounded helper work
+- keep at least one live cloud provider configured for high-risk teaching generation and review tasks
+
+This hybrid split is a course-app policy layered on top of Hermes. It does not replace Hermes memory, session storage, or summary mechanisms.
 
 ## 4. MVP And v1 Goal
 
@@ -238,6 +280,35 @@ Tool 负责执行能力，不负责课程决策。
 - `status_reader`
 - `change_applier`
 
+### 5.6 Inference Routing Policy
+
+The approved inference policy is:
+
+- official Hermes memory, `memory` tool, and `session_search` remain the only built-in cross-session memory and summary path
+- local `Ollama + gemma4` handles low-risk requests before or below the main teaching decision chain
+- the cloud provider remains the default lane for high-risk teaching reasoning
+
+Local lane in scope:
+
+- simple teacher questions in WeCom
+- status queries and run-result explanations
+- fixed-format helper drafts such as `teacher_summary` first drafts or change-summary drafts
+- candidate run-summary and recurring-failure-summary drafts for later memory curation
+
+Local lane out of scope:
+
+- `Professor Architect Agent` core task understanding and course orchestration
+- first-pass `lesson_plan.yaml` generation
+- core `ppt_script.yaml` / `notebook_script.yaml` teaching-content generation
+- `quality_review.yaml` release judgments
+- source governance, trust decisions, and release gates
+
+Routing policy:
+
+- use rules first, not model self-judgment first
+- if the request is not clearly low-risk, upgrade directly to the cloud lane
+- if the local lane fails or is uncertain, auto-upgrade to the cloud lane and record the local miss in logs
+
 ## 6. Teacher Interaction Loop
 
 ### 6.1 Supported Actions
@@ -351,6 +422,23 @@ Tool 负责执行能力，不负责课程决策。
 - 自动拆分多文件。
 
 如必须通过链接回传，链接目标应使用对象存储或文件服务。
+
+### 7.5 Lightweight Question Path
+
+The WeCom entry may answer clearly low-risk teacher messages through the local lane before invoking the full cloud teaching path.
+
+This path is limited to:
+
+- FAQ-style questions
+- status and artifact explanations
+- brief summaries and rewrites of existing outputs
+
+This path must not silently take over:
+
+- curriculum planning
+- source-sensitive teaching answers
+- review gating
+- write operations that require confirmation
 
 ## 8. Workflow Contracts
 
@@ -707,6 +795,12 @@ Agent 补充的新案例必须：
 - 本仓库 workflow 可被 Hermes 调用
 - 生成结果可写入 `outputs/runs`
 
+Additional local-inference smoke coverage:
+
+- `Ollama` in `WSL2` is reachable at the configured local endpoint
+- the simple-question route reaches the local lane
+- local-lane failure correctly upgrades to the cloud lane and leaves a log trail
+
 ## 12. Non-goals And Future Expansion
 
 ### 12.1 Non-goals For v1
@@ -719,6 +813,11 @@ Agent 补充的新案例必须：
 - 通用 Hermes 化
 - 个人微信入口
 - 无审查的动态外部抓取
+
+Additional v1 non-goals:
+
+- letting the local model become the primary teaching generator
+- replacing official Hermes memory or summary with a repo-local clone
 
 ### 12.2 Product Boundary
 

@@ -45,7 +45,8 @@ Before using this guide, the following must already be true:
 - WSL2 is installed and working.
 - Python 3.11 is available in WSL2.
 - The Windows repo path is readable from WSL2.
-- You have a model provider key ready for Hermes.
+- You have a model provider plan ready for Hermes.
+- For the approved hybrid path, this means local `Ollama` in `WSL2` for low-risk requests plus a live cloud provider for high-risk teaching tasks.
 
 ## Install Hermes In WSL2
 
@@ -114,6 +115,44 @@ Why this layout:
 - This repo stays source-controlled and read-only from Hermes's perspective
 - The course app can evolve without copying files into Hermes every time
 
+## Local Ollama Sidecar In WSL2
+
+For the approved cost-control path, run `Ollama` in the same `WSL2` environment as Hermes.
+
+Install it inside the distro with the official Linux installer:
+
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+sudo systemctl enable ollama
+sudo systemctl start ollama
+ollama pull gemma4
+```
+
+Recommended baseline:
+
+- `Ollama` listens on `127.0.0.1:11434`
+- Hermes reaches it through the local loopback address, not through a Windows-host bridge
+- the default local model for this project is `gemma4`
+
+Why this topology:
+
+- no Windows-to-WSL network indirection is required
+- local helper calls and simple-question routing can use a single stable endpoint
+- fallback from local to cloud stays a provider decision, not a networking decision
+
+The local lane is for:
+
+- simple teacher questions
+- run-status and artifact explanations
+- fixed-format helper drafts
+- candidate summaries that may later be curated into Hermes memory
+
+The local lane is not for:
+
+- core `Professor Architect Agent` decisions
+- first-pass lesson planning
+- quality gates, source governance, or release decisions
+
 ## SOUL Strategy
 
 Hermes loads `SOUL.md` only from `HERMES_HOME`, not from the current repo.
@@ -136,6 +175,23 @@ cd /path/to/hermes-agent
 hermes gateway start
 ```
 
+If the local sidecar is enabled, validate it before gateway bring-up:
+
+```bash
+curl http://127.0.0.1:11434/api/chat -d '{
+  "model": "gemma4",
+  "messages": [{"role": "user", "content": "ping"}],
+  "stream": false
+}'
+```
+
+Then run the repo-side hybrid-lane smoke check:
+
+```bash
+export HERMES_HOME=~/.hermes-intellectual-tutor
+python3 /mnt/d/Codex_Project/intellectual_tutor/scripts/check_hybrid_inference.py --hermes-home "$HERMES_HOME"
+```
+
 Or for CLI-only testing:
 
 ```bash
@@ -151,9 +207,12 @@ hermes
 - `hermes skills list` can see repo-provided skills after `external_dirs` is configured
 - Hermes launched from WSL2 can access `/mnt/d/Codex_Project/intellectual_tutor`
 - Repo `AGENTS.md` and project files are discoverable from the active workspace
+- if local inference is enabled, `curl http://127.0.0.1:11434/api/chat` succeeds from the same distro
+- `python3 /mnt/d/Codex_Project/intellectual_tutor/scripts/check_hybrid_inference.py` succeeds and writes a fallback-log probe under `$HERMES_HOME/logs/`
 
 ## Notes
 
 - Do not run the production course instance from default `~/.hermes` if that home is also used for unrelated agents.
 - Do not copy the repo `skills/` tree into `~/.hermes/skills/` by hand unless debugging. Prefer `skills.external_dirs`.
 - Do not store WeCom secrets in this repo. They belong in `$HERMES_HOME/.env`.
+- Do not replace official Hermes memory, `memory` tool, or `session_search` with a repo-local summary clone. The course app may only add routing policy on top.

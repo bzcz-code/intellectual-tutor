@@ -20,11 +20,18 @@ Use this skill when the teacher asks to:
 
 ## Procedure
 
-1. Identify whether the request is a read or write action.
-2. If the request is ambiguous about chapter scope, ask a clarification question before routing work.
-3. For write requests, produce a natural-language change summary before any file-changing tool is called.
-4. Only after explicit confirmation, route work to the appropriate course tool chain.
-5. Keep the course-level baseline and governance rules unchanged unless the user is operating through an approved config workflow.
+1. Classify the request before choosing a model or tool:
+   local-lane eligible or cloud-lane required.
+2. Local lane is limited to:
+   simple teacher questions, status explanations, fixed-format helper drafts, and candidate run summaries.
+3. Cloud lane is required for:
+   `Professor Architect Agent` orchestration, lesson-plan generation, core subagent generation, `quality_review`, source governance, and release gating.
+4. If the request is ambiguous about chapter scope, ask a clarification question before routing work.
+5. If the request is not clearly local-lane eligible, route it to the cloud lane directly.
+6. If a local call fails or is uncertain, log the miss and upgrade to the cloud lane.
+7. For write requests, produce a natural-language change summary before any file-changing tool is called.
+8. Only after explicit confirmation, route work to the appropriate course tool chain.
+9. Keep the course-level baseline and governance rules unchanged unless the user is operating through an approved config workflow.
 
 ## Current Boundaries
 
@@ -37,5 +44,7 @@ Use this skill when the teacher asks to:
 A correct run should preserve these properties:
 
 - no silent chapter guessing
+- no silent downgrade of cloud-only teaching work onto the local lane
+- local misses leave a trace before cloud upgrade
 - no direct write execution before confirmation
 - no tool invents teaching content beyond approved structured inputs
