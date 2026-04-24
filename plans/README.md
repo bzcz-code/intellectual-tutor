@@ -39,7 +39,7 @@ The next step is:
 
 Current live blocker:
 
-- `gemma4:e4b` pull attempts are currently failing against `registry.ollama.ai` with manifest and blob timeouts; retry from the dedicated `Ubuntu-24.04` distro before moving on
+- `gemma4:e4b` pull attempts now reach both `registry.ollama.ai` and the signed Cloudflare blob host, but the large blob download still fails with `EOF`, `unexpected EOF`, and intermittent `dial tcp 198.18.0.201/202:443: i/o timeout`; `ollama list` is still empty and partial blob files remain under `/usr/share/ollama/.ollama/models/blobs/`
 
 Use these documents in that order:
 

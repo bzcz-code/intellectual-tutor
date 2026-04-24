@@ -87,6 +87,10 @@ Completed in this session:
 - initialized `AGENT.md` and rewrote `AGENTS.md` so both now point at the current plan-driven resume workflow instead of the earlier stale WSL2/Hermes install pointer
 - expanded `AGENTS.md` into a real repository orientation document with:
   read order, layered project map, key entry scripts, key Hermes tools, task-to-file routing, and the default concrete example path under `gradient_descent`
+- retried `ollama pull gemma4:e4b` from the dedicated `Ubuntu-24.04` runtime; the pull now gets past manifest resolution and starts a 16-part blob download, but still exits before completion
+- captured `journalctl` evidence showing repeated `EOF`, `unexpected EOF`, and intermittent `dial tcp 198.18.0.201/202:443: i/o timeout` while downloading blob `sha256:4c27e0f5b5ad...`
+- verified with `curl -Ivs` from `WSL2` that both `https://registry.ollama.ai/v2/` and the signed `r2.cloudflarestorage.com` blob host are TLS-reachable, so the blocker is large-transfer stability rather than basic DNS or certificate failure
+- verified that `ollama list` remains empty while partial blob files are accumulating under `/usr/share/ollama/.ollama/models/blobs/`
 
 Remaining work:
 
@@ -107,8 +111,12 @@ Current blockers and assumptions:
 - official Hermes memory behavior remains the source of truth for long-term summaries and session recall
 - the dedicated runtime should continue using `/root/.hermes-intellectual-tutor` unless the machine setup changes
 - current blocker on the machine:
-  `ollama pull gemma4:e4b` is failing at the registry/manifest stage with network timeouts such as
-  `Get "https://registry.ollama.ai/v2/library/gemma4/manifests/e4b": dial tcp 198.18.0.201:443: i/o timeout`
+  `ollama pull gemma4:e4b` now gets past manifest resolution and starts downloading blob
+  `sha256:4c27e0f5b5adf02ac956c7322bd2ee7636fe3f45a8512c9aba5385242cb6e09a`,
+  but the transfer repeatedly fails with `EOF`, `unexpected EOF`, and intermittent
+  `dial tcp 198.18.0.201/202:443: i/o timeout`
+- `curl -Ivs` confirms both the registry host and the signed Cloudflare blob host are reachable from `WSL2`, so the active issue is sustained large-blob transfer stability rather than basic host reachability
+- `ollama list` is still empty and partial blob files remain under `/usr/share/ollama/.ollama/models/blobs/`
 - until `ollama list` shows `gemma4:e4b`, do not advance to `.env` credential wiring or WeCom callback validation
 
 Verification evidence already captured:
@@ -123,6 +131,11 @@ Verification evidence already captured:
 - `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'curl -fsSL https://ollama.com/install.sh | sh'` followed by the explicit install/retry path with `zstd`, service creation, and `systemctl enable ollama`
 - `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'curl -fsS http://127.0.0.1:11434/api/tags'`
 - `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'journalctl -u ollama -n 80 --no-pager'`
+- `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'export HERMES_HOME=/root/.hermes-intellectual-tutor; /usr/local/bin/ollama pull gemma4:e4b'`
+- `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'journalctl -u ollama -n 120 --no-pager'`
+- `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'env | grep -i proxy || true; getent ahosts registry.ollama.ai || true; timeout 20 curl -Ivs https://registry.ollama.ai/v2/ 2>&1 || true'`
+- `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'getent ahosts dd20bb891979d25aebc8bec07b2b3bbc.r2.cloudflarestorage.com || true; timeout 20 curl -Ivs https://dd20bb891979d25aebc8bec07b2b3bbc.r2.cloudflarestorage.com 2>&1 || true'`
+- `wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'ls -lah /usr/share/ollama/.ollama/models; find /usr/share/ollama/.ollama/models/blobs -maxdepth 1 -type f | sed -n "1,40p"'`
 
 ## Progress Synchronization Protocol
 
@@ -155,8 +168,8 @@ Do not rely on chat history as the only handoff mechanism.
 - `M4 Course Agent And Subagent Setup`: repo-side skeleton completed
 - `M5 Run Layout And Release Chain`: completed for local run-based workflow
 - `M6 Teacher Change Loop`: completed for local workflow, including structured and legacy compatibility plus PPT regeneration sync
-- `M6.5 Hybrid Inference Cost-Control Lane`: approved in design, not yet implemented
-- `M7 WeCom End-to-End Integration`: in progress; WSL2 distro, official Hermes install, dedicated `HERMES_HOME`, and repo-skill mounting are verified, but hybrid routing, callback secrets, and live message-path testing are still pending
+- `M6.5 Hybrid Inference Cost-Control Lane`: repo-side implementation is in place, but live `gemma4:e4b` availability and smoke-test evidence are still blocked on the WSL2 model pull
+- `M7 WeCom End-to-End Integration`: in progress; WSL2 distro, official Hermes install, dedicated `HERMES_HOME`, repo-skill mounting, and repo-side hybrid-routing wiring are verified, but live local-model validation, callback secrets, and message-path testing are still pending
 - `M8 Regression And Local Operations`: partially prepared in docs and in the live machine environment, but not completed as a verified deployed system
 
 ## Fixed Architecture
@@ -277,11 +290,8 @@ Goal: reduce cloud cost while keeping high-risk teaching reasoning on the cloud 
 
 Remaining deliverables:
 
-- WSL2-side `Ollama` deployment notes
-- local env/config template entries
-- first low-risk routing rules
-- fallback logging behavior
-- smoke-test evidence for local lane plus cloud fallback
+- successful `gemma4:e4b` pull completion inside the dedicated `Ubuntu-24.04` runtime
+- smoke-test evidence for the local lane plus cloud fallback
 
 ### M7. WeCom End-to-End Integration
 
@@ -328,20 +338,23 @@ That installation path is complete enough to move into hybrid routing implementa
 Execute the next slice in this order:
 
 1. retry `ollama pull gemma4:e4b` until the local model is fully available in `WSL2`
-2. run `python3 /mnt/d/Codex_Project/intellectual_tutor/scripts/check_hybrid_inference.py --hermes-home /root/.hermes-intellectual-tutor`
-3. confirm that the fallback-log probe writes under `/root/.hermes-intellectual-tutor/logs/hybrid_router_fallback.jsonl`
-4. then open `/root/.hermes-intellectual-tutor/.env` inside `WSL2`
-5. provide the live cloud-model credentials needed for high-risk Hermes responses
-6. provide `WECOM_CALLBACK_CORP_ID`, `WECOM_CALLBACK_CORP_SECRET`, `WECOM_CALLBACK_AGENT_ID`, `WECOM_CALLBACK_TOKEN`, and `WECOM_CALLBACK_ENCODING_AES_KEY`
-7. optionally set `WECOM_CALLBACK_ALLOWED_USERS` for bring-up safety
-8. start `hermes gateway run` or `hermes gateway start` with `HERMES_HOME=/root/.hermes-intellectual-tutor`
-9. verify the callback endpoint can be reached and validated by WeCom
-10. send the first allowed-user text message through WeCom and confirm Hermes receives and replies
+2. if the pull fails again, confirm the failure mode against `journalctl -u ollama -n 120 --no-pager` and the registry/blob `curl -Ivs` checks before assuming a new root cause
+3. run `python3 /mnt/d/Codex_Project/intellectual_tutor/scripts/check_hybrid_inference.py --hermes-home /root/.hermes-intellectual-tutor`
+4. confirm that the fallback-log probe writes under `/root/.hermes-intellectual-tutor/logs/hybrid_router_fallback.jsonl`
+5. then open `/root/.hermes-intellectual-tutor/.env` inside `WSL2`
+6. provide the live cloud-model credentials needed for high-risk Hermes responses
+7. provide `WECOM_CALLBACK_CORP_ID`, `WECOM_CALLBACK_CORP_SECRET`, `WECOM_CALLBACK_AGENT_ID`, `WECOM_CALLBACK_TOKEN`, and `WECOM_CALLBACK_ENCODING_AES_KEY`
+8. optionally set `WECOM_CALLBACK_ALLOWED_USERS` for bring-up safety
+9. start `hermes gateway run` or `hermes gateway start` with `HERMES_HOME=/root/.hermes-intellectual-tutor`
+10. verify the callback endpoint can be reached and validated by WeCom
+11. send the first allowed-user text message through WeCom and confirm Hermes receives and replies
 
 Resume command bundle for the next session:
 
 ```bash
 wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'export HERMES_HOME=/root/.hermes-intellectual-tutor; systemctl is-active ollama; /usr/local/bin/ollama pull gemma4:e4b; /usr/local/bin/ollama list'
+wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'journalctl -u ollama -n 120 --no-pager'
+wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'getent ahosts registry.ollama.ai; timeout 20 curl -Ivs https://registry.ollama.ai/v2/ 2>&1 || true'
 wsl.exe -d Ubuntu-24.04 -u root -- bash -lc 'export HERMES_HOME=/root/.hermes-intellectual-tutor; python3 /mnt/d/Codex_Project/intellectual_tutor/scripts/check_hybrid_inference.py --hermes-home "$HERMES_HOME"'
 ```
 
