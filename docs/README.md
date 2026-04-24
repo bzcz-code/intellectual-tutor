@@ -8,7 +8,7 @@ Use this file as the documentation entry point for new sessions.
 - Architecture overview: [architecture/course-app-overview.md](architecture/course-app-overview.md)
 - Script-to-tool mapping: [architecture/script-to-tool-mapping.md](architecture/script-to-tool-mapping.md)
 - WSL2 deployment: [deployment/hermes-wsl2-setup.md](deployment/hermes-wsl2-setup.md)
-- WeCom deployment: [deployment/wecom-setup.md](deployment/wecom-setup.md)
+- Feishu deployment: [deployment/feishu-setup.md](deployment/feishu-setup.md)
 
 ## Historical Documents
 
@@ -22,8 +22,8 @@ For current planning and implementation decisions:
 - use the active plan in `plans/`
 - treat WSL2 Hermes installation as completed unless the machine has been reset
 - treat the approved runtime split as:
-  `Ollama` in `WSL2` for low-risk requests, official Hermes memory for summaries, cloud provider for high-risk teaching work
+  native Windows `Ollama` for low-risk requests, official Hermes memory for summaries, and a cloud provider for high-risk teaching work
 - treat the current restore point as:
-  finish `ollama pull gemma4:e4b` in `/root/.hermes-intellectual-tutor`, then run `scripts/check_hybrid_inference.py`, then continue to `.env` and WeCom bring-up
-- resume from hybrid routing implementation before broad WeCom rollout unless evidence shows it is already complete
+  verify native Windows `Ollama`, make sure the Windows `Ollama` process inherits the required proxy path or the proxy is `TUN` / global enough for `gemma4:26b`, confirm `OLLAMA_BASE_URL=http://172.29.0.1:11434` plus `LOCAL_FAST_MODEL=gemma4:26b` are still set in `/root/.hermes-intellectual-tutor/.env`, then continue to cloud credentials and Feishu bring-up
+- resume from hybrid routing implementation before broad Feishu rollout unless evidence shows it is already complete
 - do not treat `docs/MVP.md` as the current spec

@@ -4,8 +4,9 @@ local_lane:
   provider: ollama
   base_url_env: OLLAMA_BASE_URL
   model_env: LOCAL_FAST_MODEL
+  # Override in $HERMES_HOME/.env when Hermes runs in WSL2 and Ollama runs natively on Windows.
   default_base_url: http://127.0.0.1:11434
-  default_model: gemma4
+  default_model: gemma4:26b
   request_classes:
     - simple_teacher_question
     - status_explanation

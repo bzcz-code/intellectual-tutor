@@ -34,7 +34,7 @@ This repo defines the course-specific behavior:
 - source governance
 - quality gates
 - release and summary artifacts
-- WeCom interaction policy
+- Feishu interaction policy
 
 ### Layer 3. Course Execution Assets
 

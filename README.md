@@ -4,7 +4,7 @@ This repository is not the Hermes core.
 
 It is a university teaching copilot that runs on top of the official Hermes Agent.
 
-Its final product goal is to help teachers in the AI math foundation course cluster generate complete chapter teaching packages through WeCom, revise them through dialogue, accumulate confirmed teaching preferences, and keep course context across later chapters instead of acting as only a one-off single-chapter generator.
+Its final product goal is to help teachers in the AI math foundation course cluster generate complete chapter teaching packages through Feishu, revise them through dialogue, accumulate confirmed teaching preferences, and keep course context across later chapters instead of acting as only a one-off single-chapter generator.
 
 ## Active Entry Points
 
@@ -23,7 +23,8 @@ This repo provides:
 
 - course-app prompts, skills, tools, and workflow contracts
 - deployment guidance for running the course app with official Hermes in WSL2
-- WeCom integration guidance for the course-specific Hermes instance
+- deployment guidance for connecting that WSL2 Hermes instance to native Windows `Ollama`
+- Feishu integration guidance for the course-specific Hermes instance
 - hybrid local/cloud inference guidance for cost-aware routing
 
 This repo does not provide:
@@ -41,7 +42,7 @@ The active system boundary is:
 The approved inference split is:
 
 - official Hermes memory, `memory` tool, and `session_search` remain the built-in summary and recall path
-- local `Ollama + gemma4` in `WSL2` handles low-risk questions and helper drafts
+- native Windows `Ollama + gemma4:26b` handles low-risk questions and helper drafts for the Hermes instance running in `WSL2`
 - a live cloud provider remains required for high-risk teaching generation and review
 
 Inside this repo, the course layer is organized as:
@@ -55,7 +56,7 @@ Inside this repo, the course layer is organized as:
 - `schemas/course/`
   workflow contracts for lesson plan, ppt script, notebook script, review, release, and teacher change flow
 - `docs/deployment/`
-  WSL2 and WeCom setup guides
+  WSL2 and Feishu setup guides
 
 ## Current Status
 
@@ -75,24 +76,27 @@ Already completed on the current machine:
 
 What is still external:
 
-- completing the local `gemma4:e4b` bring-up and hybrid smoke check
 - populating the dedicated Hermes instance with live model-provider credentials
-- populating the dedicated Hermes instance with live WeCom callback secrets
-- starting and validating the Hermes gateway callback path
-- connecting the official WeCom callback adapter
-- running the first real Hermes -> WeCom end-to-end smoke test
+- populating the dedicated Hermes instance with live Feishu credentials
+- starting and validating the Hermes gateway Feishu path
+- connecting the official Hermes Feishu/Lark adapter
+- running the first real Hermes -> Feishu end-to-end smoke test
 
 Current blocker:
 
-- the repo-side hybrid-routing implementation is in place, but the live resume point is still blocked on `ollama pull gemma4:e4b` timing out against `registry.ollama.ai` before the local-lane smoke check can run
+- the active blocker is now the local-model switch to `gemma4:26b`: Windows `Ollama 0.21.1` is installed, `WSL2` can reach the Windows-hosted endpoint, but `gemma4:26b` is not yet available locally and the current Windows `Ollama` service appears to start without `HTTP_PROXY` or `HTTPS_PROXY` even though the machine proxy is enabled
 
 Current default resume point:
 
+- verify native Windows `Ollama 0.21.1` is still installed and serving `http://127.0.0.1:11434`
+- make the Windows `Ollama` process inherit the required proxy path or confirm the proxy is `TUN` / global enough for large blob downloads
+- complete `ollama pull gemma4:26b` on Windows
 - enter `Ubuntu-24.04` as `root`
 - keep `HERMES_HOME=/root/.hermes-intellectual-tutor`
-- finish `ollama pull gemma4:e4b`
-- run `python3 /mnt/d/Codex_Project/intellectual_tutor/scripts/check_hybrid_inference.py --hermes-home /root/.hermes-intellectual-tutor`
-- only then continue to `.env` credential wiring and WeCom callback validation
+- confirm `OLLAMA_BASE_URL=http://172.29.0.1:11434` is still present in `/root/.hermes-intellectual-tutor/.env`
+- confirm `LOCAL_FAST_MODEL=gemma4:26b` is still present in `/root/.hermes-intellectual-tutor/.env`
+- rerun `scripts/check_hybrid_inference.py`
+- only then continue to `.env` credential wiring and Feishu validation
 
 If a new session says "continue the plan" or "继续完成计划", start from hybrid routing implementation on top of the existing WSL2 Hermes install rather than from repo-internal scaffolding.
 

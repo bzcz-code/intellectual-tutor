@@ -110,7 +110,7 @@ def main() -> None:
         args.local_model
         or env_values.get("LOCAL_FAST_MODEL")
         or local_lane.get("default_model")
-        or "gemma4"
+        or "gemma4:26b"
     )
     cloud_provider = (
         args.cloud_provider

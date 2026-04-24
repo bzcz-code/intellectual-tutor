@@ -3,17 +3,13 @@ skills:
     - /mnt/d/Codex_Project/intellectual_tutor/skills
 
 platforms:
-  wecom_callback:
+  feishu:
     enabled: true
     extra:
-      host: "0.0.0.0"
-      port: 8645
-      path: "/wecom/callback"
+      domain: "feishu"
+      connection_mode: "websocket"
       # Fill these locally in $HERMES_HOME/config.yaml or prefer environment variables:
-      # corp_id: "ww_xxx"
-      # corp_secret: "secret"
-      # agent_id: "1000002"
-      # token: "token"
-      # encoding_aes_key: "43-char-key"
+      # app_id: "cli_a1b2c3"
+      # app_secret: "secret"
 
 # Keep secrets in $HERMES_HOME/.env, not in this repo.

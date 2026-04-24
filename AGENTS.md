@@ -32,7 +32,7 @@ It is:
 - a teacher-facing course-prep copilot
 - a structured course-generation workflow
 - a run-based artifact pipeline
-- a WeCom-first Hermes application instance
+- a Feishu-first Hermes application instance
 
 The durable teaching thesis in this repo is:
 
@@ -161,7 +161,7 @@ This layer is where you inspect real generated behavior instead of guessing.
 - `docs/architecture/`
   architecture explanations such as course-app overview and script-to-tool mapping
 - `docs/deployment/`
-  WSL2, Hermes, Ollama, and WeCom setup guidance
+  WSL2, Hermes, Ollama, and Feishu setup guidance
 - `skills/README.md`
   skill structure overview for this repo
 
@@ -223,7 +223,7 @@ Use this quick routing table when deciding where to work:
   go to `scripts/apply_confirmed_change.py` and `tools/change_applier.py`
 - run inspection or debugging
   go to `scripts/read_run_status.py` and the relevant path under `outputs/runs/`
-- WeCom or Hermes deployment
+- Feishu or Hermes deployment
   go to `docs/deployment/` and the active plan
 
 ## Resume Rule For New Sessions
@@ -238,15 +238,21 @@ If a new session starts with `continue the plan` or an equivalent Chinese resume
 
 Unless the plan files are updated later, the current default resume point is:
 
-1. enter `WSL2` distro `Ubuntu-24.04` as `root`
-2. keep `HERMES_HOME=/root/.hermes-intellectual-tutor`
-3. retry `ollama pull gemma4:e4b` until `ollama list` shows the model
-4. run `python3 /mnt/d/Codex_Project/intellectual_tutor/scripts/check_hybrid_inference.py --hermes-home /root/.hermes-intellectual-tutor`
-5. only after that smoke check passes, continue to cloud-model credentials and WeCom callback validation
+1. verify native Windows `Ollama 0.21.1` is still installed and serving `http://127.0.0.1:11434`
+2. make the Windows `Ollama` process inherit the required proxy path or confirm the proxy is `TUN` / global enough for large blob downloads
+3. complete `ollama pull gemma4:26b` on Windows
+4. enter `WSL2` distro `Ubuntu-24.04` as `root`
+5. keep `HERMES_HOME=/root/.hermes-intellectual-tutor`
+6. confirm `/root/.hermes-intellectual-tutor/.env` still contains:
+   `OLLAMA_BASE_URL=http://172.29.0.1:11434`
+7. confirm `LOCAL_FAST_MODEL=gemma4:26b` in `/root/.hermes-intellectual-tutor/.env`
+8. rerun the hybrid smoke check
+9. continue to cloud-model credentials in `/root/.hermes-intellectual-tutor/.env`
+10. continue to Feishu credentials and gateway validation
 
 ## Current Live Blocker
 
-- `gemma4:e4b` pull attempts are currently timing out against `registry.ollama.ai`; do not advance to `.env` or WeCom callback work until the model is locally available
+- the active blocker is the local-model switch to `gemma4:26b`: Windows `Ollama 0.21.1` is installed and reachable from `WSL2`, but the model is not yet available locally and the current Windows `Ollama` service appears to start without `HTTP_PROXY` or `HTTPS_PROXY` even though the machine proxy is enabled
 
 ## Anti-Patterns To Avoid
 
@@ -254,4 +260,4 @@ Unless the plan files are updated later, the current default resume point is:
 - creating a second repo-local memory or summary subsystem
 - editing prompts while ignoring schema or tool contract drift
 - treating `outputs/` as disposable when it contains the clearest runtime evidence
-- moving into `.env` or WeCom callback work before the local hybrid smoke check passes
+- moving into `.env` or Feishu work before the local hybrid smoke check passes

@@ -79,13 +79,13 @@
 - 教学质量门禁。
 - 章节生成、审查、打包与回传逻辑。
 - 本机部署说明。
-- 企业微信接入配置说明。
+- 飞书接入配置说明。
 
-### 2.3 WeCom Entry
+### 2.3 Feishu Entry
 
-教师入口直接使用官方 `Hermes Agent` 的 `WeCom (企业微信)` adapter。
+教师入口直接使用官方 `Hermes Agent` 的 `Feishu / Lark` adapter。
 
-企业微信只做教师自然语言入口与附件回传，不承载课程业务逻辑，不自行维护一套 agent runtime。
+飞书只做教师自然语言入口与附件回传，不承载课程业务逻辑，不自行维护一套 agent runtime。
 
 ### 2.4 Non-ownership
 
@@ -126,7 +126,7 @@
 
 - Hermes 的课程 app / workflow 仓库。
 - 本机部署说明仓库。
-- WeCom 配置说明仓库。
+- Feishu 配置说明仓库。
 
 本仓库不是官方 Hermes 源码镜像，不 vendor 官方 Hermes 本体。
 
@@ -137,8 +137,8 @@ The v1 deployment may use a hybrid inference split to reduce cloud-model cost wi
 Approved baseline:
 
 - run the official `Hermes Agent` in `WSL2`
-- run `Ollama` in the same `WSL2` environment for low-latency local calls
-- use a local `gemma4` model as the default low-cost lane for simple questions and bounded helper work
+- run native Windows `Ollama` and expose it to the Hermes instance in `WSL2` through `OLLAMA_BASE_URL`
+- use a local `gemma4:26b` model as the default low-cost lane for simple questions and bounded helper work
 - keep at least one live cloud provider configured for high-risk teaching generation and review tasks
 
 This hybrid split is a course-app policy layered on top of Hermes. It does not replace Hermes memory, session storage, or summary mechanisms.
@@ -285,12 +285,12 @@ Tool 负责执行能力，不负责课程决策。
 The approved inference policy is:
 
 - official Hermes memory, `memory` tool, and `session_search` remain the only built-in cross-session memory and summary path
-- local `Ollama + gemma4` handles low-risk requests before or below the main teaching decision chain
+- native Windows `Ollama + gemma4:26b` handles low-risk requests before or below the main teaching decision chain for the Hermes instance running in `WSL2`
 - the cloud provider remains the default lane for high-risk teaching reasoning
 
 Local lane in scope:
 
-- simple teacher questions in WeCom
+- simple teacher questions in Feishu
 - status queries and run-result explanations
 - fixed-format helper drafts such as `teacher_summary` first drafts or change-summary drafts
 - candidate run-summary and recurring-failure-summary drafts for later memory curation
@@ -359,15 +359,15 @@ Routing policy:
 - 影响 `notebook_script.yaml`
 - 需要整章复审
 
-## 7. WeCom Entry
+## 7. Feishu Entry
 
 ### 7.1 Channel Strategy
 
-第一版首选聊天渠道为企业微信（WeCom）。
+第一版首选聊天渠道为飞书（Feishu / Lark）。
 
 后续扩展目标为：
 
-- 飞书
+- 企业微信（WeCom）
 
 第一版不以 Web 教师控制台作为教师主入口。
 
@@ -425,7 +425,7 @@ Routing policy:
 
 ### 7.5 Lightweight Question Path
 
-The WeCom entry may answer clearly low-risk teacher messages through the local lane before invoking the full cloud teaching path.
+The Feishu entry may answer clearly low-risk teacher messages through the local lane before invoking the full cloud teaching path.
 
 This path is limited to:
 
@@ -774,9 +774,9 @@ Agent 补充的新案例必须：
 - 通过难度审查
 - 不覆盖教师核心资料
 
-### 11.5 WeCom End-to-End Tests
+### 11.5 Feishu End-to-End Tests
 
-企业微信端到端验证至少覆盖：
+飞书端到端验证至少覆盖：
 
 - 新生成请求
 - 状态查询
@@ -791,13 +791,13 @@ Agent 补充的新案例必须：
 本机部署 smoke test 至少覆盖：
 
 - WSL2 中 Hermes 可启动
-- WeCom adapter 可接收消息
+- Feishu adapter 可接收消息
 - 本仓库 workflow 可被 Hermes 调用
 - 生成结果可写入 `outputs/runs`
 
 Additional local-inference smoke coverage:
 
-- `Ollama` in `WSL2` is reachable at the configured local endpoint
+- the configured `OLLAMA_BASE_URL` reaches the Windows-hosted `Ollama` endpoint from `WSL2`
 - the simple-question route reaches the local lane
 - local-lane failure correctly upgrades to the cloud lane and leaves a log trail
 
@@ -807,7 +807,7 @@ Additional local-inference smoke coverage:
 
 第一版不做：
 
-- 飞书入口
+- 企业微信入口
 - 多学科共享入口
 - Web 教师工作台
 - 通用 Hermes 化
@@ -844,7 +844,7 @@ Additional v1 non-goals:
 
 后续可扩展方向包括：
 
-- 飞书
+- 企业微信（WeCom）
 - 多学科空间
 - Web 审查工作台
 - 更多课程模板

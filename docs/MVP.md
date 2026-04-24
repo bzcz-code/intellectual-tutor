@@ -24,7 +24,7 @@ The historical MVP covered:
 It did not represent the current product boundary of:
 
 - official Hermes as the runtime base
-- WeCom as the official teacher entry
+- Feishu as the official teacher entry
 - the course app as a mounted Hermes app
 
 ## Status
