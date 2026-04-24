@@ -64,6 +64,8 @@ What is still external:
 - connecting the official WeCom callback adapter
 - running the first real Hermes -> WeCom end-to-end smoke test
 
+If a new session says "continue the plan" or "继续完成计划", start from the WSL2 Hermes installation step rather than from repo-internal scaffolding.
+
 ## Historical Note
 
 `docs/MVP.md` is retained only as a historical note for the earlier local single-chapter pipeline.

@@ -10,6 +10,65 @@
 
 本计划明确废弃“自建 Hermes runtime / 自建消息网关 / 自建记忆系统”路线。
 
+## Current Execution Pointer
+
+The repository-side course-app scaffolding is already in place.
+
+When continuing this plan, do not restart from early repo-internal scaffolding tasks unless the repository has been reset.
+
+The next execution slice is:
+
+1. install the official `Hermes Agent` inside `WSL2`
+2. initialize a dedicated `HERMES_HOME`
+3. mount this repository into Hermes as the course app
+4. verify Hermes can load the repo skills and prompt templates
+5. continue into WeCom callback setup and end-to-end smoke testing
+
+Primary references:
+
+- `docs/deployment/hermes-wsl2-setup.md`
+- `docs/deployment/wecom-setup.md`
+- `scripts/bootstrap_hermes_course_app.py`
+
+Rule for new sessions:
+
+- If the user says "继续完成计划", start with WSL2 Hermes installation.
+- Do not restart from M1 document scaffolding unless files are missing.
+
+## Progress Synchronization Protocol
+
+This plan is the repository source of truth for execution status.
+
+After every meaningful task batch, update this file before ending the session.
+
+Each update should capture:
+
+1. current milestone state
+2. completed work
+3. remaining work
+4. exact next step
+5. blockers, assumptions, or environment prerequisites
+6. verification commands or evidence when relevant
+
+If the resume point changes, also update:
+
+- `plans/README.md`
+- `README.md`
+- `docs/README.md`
+
+Do not rely on chat history as the only handoff mechanism.
+
+## Current Milestone Snapshot
+
+- `M1 Hermes Integration Skeleton`: completed in repo
+- `M2 Workflow Contract Refactor`: completed in repo
+- `M3 Toolization Of Existing Generators`: completed in repo
+- `M4 Course Agent And Subagent Setup`: repo-side skeleton completed
+- `M5 Run Layout And Release Chain`: completed for local run-based workflow
+- `M6 Teacher Change Loop`: completed for local workflow, including structured and legacy compatibility plus PPT regeneration sync
+- `M7 WeCom End-to-End Integration`: not started
+- `M8 Regression And Local Operations`: partially prepared in docs, not completed as a live deployed system
+
 ## Fixed Architecture
 
 ### Official Hermes Core
@@ -263,20 +322,18 @@
 
 ## Immediate Next Slice
 
-下一步最值得立刻开工的是 `M1`，具体到可执行任务是：
+当前最值得立刻开工的不是重新做 `M1` 文档骨架，而是进入系统集成阶段的第一步：`WSL2 official Hermes installation`。
 
-1. 增加 `docs/deployment/hermes-wsl2-setup.md`
-2. 增加 `docs/deployment/wecom-setup.md`
-3. 增加 `docs/architecture/course-app-overview.md`
-4. 新建 Hermes course app 目录骨架：
-   - course persona
-   - main agent
-   - subagents
-   - skills
-   - tools
-5. 写清现有脚本到 future tools 的映射表
+具体执行顺序是：
 
-只有这一步完成后，后面的 contract 重构和 WeCom 接入才不会继续沿着旧的错误路线走。
+1. 在当前电脑的 `WSL2` 中确认 Python 3.11、`uv` 和 repo 挂载路径可用
+2. 按 `docs/deployment/hermes-wsl2-setup.md` 安装官方 `Hermes Agent`
+3. 创建专用 `HERMES_HOME`
+4. 运行 `scripts/bootstrap_hermes_course_app.py` 生成该实例需要的 `SOUL.md`、`.env` 和 `config.yaml`
+5. 在 WSL2 中启动 Hermes，并验证它能看到本仓库的 external skills
+6. 然后进入 `WeCom` callback 配置和 smoke test
+
+只有这一步完成后，后面的真实 WeCom 联调和端到端交付才算进入可运行状态。
 
 ## Anti-patterns
 

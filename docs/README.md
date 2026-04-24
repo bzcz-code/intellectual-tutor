@@ -20,4 +20,5 @@ For current planning and implementation decisions:
 
 - use `docs/PRD.md`
 - use the active plan in `plans/`
+- when execution is resumed, start from WSL2 Hermes installation
 - do not treat `docs/MVP.md` as the current spec
