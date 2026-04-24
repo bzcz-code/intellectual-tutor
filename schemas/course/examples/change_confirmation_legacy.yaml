@@ -1,0 +1,14 @@
+schema_version: "0.1.0"
+confirmation_id: "confirm-legacy-example-000001"
+request_id: "change-legacy-example-000001"
+run_id: "replace-with-run-id"
+teacher_id: "teacher-demo"
+confirmed_at: "2026-04-24T00:05:00Z"
+confirmation_text: "Confirmed. Apply the change and regenerate the affected outputs."
+summary_presented: true
+approved: true
+regen_scope:
+  lesson_plan_only: false
+  regenerate_ppt: false
+  regenerate_notebook: true
+  rerun_review: true

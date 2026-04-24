@@ -1,0 +1,18 @@
+schema_version: "0.1.0"
+request_id: "change-structured-example-000001"
+run_id: "replace-with-run-id"
+chapter_id: "gradient_descent"
+teacher_id: "teacher-demo"
+requested_at: "2026-04-24T00:00:00Z"
+request_text: "Make the AI mapping stage speak more directly about parameter updates in model training."
+intent_scope:
+  modifies_teaching_content: true
+  modifies_chapter_config: false
+  touches_course_baseline: false
+  touches_source_rules: false
+proposed_changes:
+  - target: "lesson_plan.nodes.gradient_descent-ai-mapping"
+    field: "ai_mapping.explanation"
+    old_value: "Map the one-dimensional update rule back to the full training loop."
+    new_value: "Connect the update rule directly to parameter updates, loss reduction, and step size in model training."
+    reason: "The teacher wants the AI mapping stage to be more explicit and classroom-ready."

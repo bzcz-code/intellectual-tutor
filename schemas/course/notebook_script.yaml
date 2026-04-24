@@ -1,0 +1,22 @@
+schema_version: "0.1.0"
+run_id: "20260424-000000-demo"
+chapter_id: "gradient_descent"
+source_lesson_plan: "outputs/runs/gradient_descent/20260424-000000-demo/source_bundle/lesson_plan.yaml"
+experiments:
+  - node_id: "gradient_descent-experiment-learning-rate"
+    title: "学习率对训练轨迹的影响"
+    objective: "让学生看见慢收敛、稳定收敛和震荡/不稳定三类训练表现"
+    expected_observations:
+      - "eta=0.05 下降较慢"
+      - "eta=0.2 稳定收敛"
+      - "eta=1.05 出现震荡或不稳定"
+    code_cells:
+      - cell_id: "setup"
+        purpose: "定义损失函数与梯度下降循环"
+      - cell_id: "run-learning-rates"
+        purpose: "运行三个学习率的实验"
+      - cell_id: "plot-results"
+        purpose: "绘制损失曲线和参数轨迹"
+    discussion_questions:
+      - "为什么学习率过大会导致训练不稳定？"
+      - "为什么学习率过小方向正确但进展缓慢？"

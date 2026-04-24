@@ -1,0 +1,80 @@
+schema_version: "0.1.0"
+run_id: "20260424-000000-demo"
+chapter_id: "gradient_descent"
+course_id: "ai_math_foundations"
+teacher_id: "teacher-demo"
+generated_at: "2026-04-24T00:00:00Z"
+summary:
+  title: "梯度下降与优化"
+  audience: "研究生 AI 数学基础补课"
+  duration_minutes: 120
+  main_question: "模型犯错之后，参数为什么知道往哪里改？"
+  key_takeaway: "梯度把误差转化为参数更新方向，学习率决定每一步更新的尺度。"
+teaching_spine:
+  - "应用问题"
+  - "数学抽象"
+  - "模型解释"
+  - "实验验证"
+  - "作业评价"
+nodes:
+  - node_id: "gradient_descent-concept-loss"
+    node_type: "concept"
+    order: 1
+    title: "损失函数为什么只是反馈，不是方向"
+    main_question: "loss 告诉了什么，没告诉什么？"
+    key_takeaway: "loss 只告诉错得多严重，不能直接告诉参数往哪改。"
+    bridge:
+      enabled: true
+      difficulty: "low"
+      time_budget_minutes: 5
+      skip_condition: "学生能解释标量反馈与方向信息的区别"
+    ai_mapping:
+      role_in_model: "训练循环中的误差反馈"
+      explanation: "loss 连接预测结果与优化目标"
+    experiment_observation:
+      required: false
+      notes: "本节点主要服务后续梯度和更新方向"
+    student_evidence:
+      classroom_action: "解释为什么 loss 不能直接指导参数增减"
+      observable_behavior: "学生能口头区分反馈值和更新方向"
+    source_refs:
+      - source_id: "core-textbook-01"
+        anchor_id: "sec-optim-loss"
+  - node_id: "gradient_descent-experiment-learning-rate"
+    node_type: "experiment"
+    order: 2
+    parent_node_id: "gradient_descent-concept-loss"
+    title: "学习率如何改变训练轨迹"
+    main_question: "为什么同一个问题会出现慢收敛、稳定收敛和震荡？"
+    key_takeaway: "学习率控制步幅，不同数值会导致完全不同的训练动态。"
+    bridge:
+      enabled: false
+      difficulty: "none"
+      time_budget_minutes: 0
+      skip_condition: ""
+    ai_mapping:
+      role_in_model: "参数更新步长"
+      explanation: "eta 决定每步沿梯度方向移动的尺度"
+    experiment_observation:
+      required: true
+      notes: "必须对比至少三个学习率轨迹"
+    student_evidence:
+      classroom_action: "根据图像解释不同学习率的行为差异"
+      observable_behavior: "学生能把曲线形态与学习率大小对应起来"
+    source_refs:
+      - source_id: "core-textbook-01"
+        anchor_id: "sec-learning-rate"
+homework:
+  required: true
+  nodes:
+    - node_id: "gradient_descent-homework-core"
+      node_type: "homework"
+      order: 99
+      title: "梯度下降理解作业"
+      questions:
+        - "用自己的话解释梯度、负梯度方向和学习率的作用。"
+      answers:
+        - "梯度给出当前位置损失变化最敏感的方向，负梯度方向是局部下降方向，学习率控制步长。"
+      scoring_evidence:
+        - "能把符号映射回训练循环"
+        - "能解释学习率导致的轨迹差异"

@@ -1,10 +1,18 @@
-# AI 课程群智能备课 Hermes Agent PRD
+# Intellectual Tutor: A Hermes Course App
 
-## 1. 产品定位
+## 1. Product Identity
 
-本项目是面向大学教师的 AI 课程群智能备课 Hermes Agent 包。第一阶段聚焦《人工智能数学基础》课程，帮助教师生成高质量单章成品课件与教学材料。
+`Intellectual Tutor` 是一个运行在官方 `Hermes Agent` 之上的课程备课 app，面向讲授 AI 课程群的大学教师，帮助教师围绕单章主题稳定生成高质量上课包，并通过企业微信完成查询、修改、确认和重生成闭环。
 
-产品目标不是替代教师授课，而是帮助教师把抽象数学变成一堂学生能理解 AI 本质的课。
+本产品不是 Hermes 本体，也不是新的通用智能体框架；它是一个专用于课程备课的 Hermes 垂直应用。
+
+第一阶段聚焦《人工智能数学基础》课程，首个黄金样例是“梯度下降与优化”。
+
+核心目标不是替代教师授课，而是成为教师的备课与复盘副驾驶：
+
+- 用真实 AI 训练问题牵引学生理解数学抽象。
+- 帮助教师组织一章课的教学目标、讲解路径、实验和评价。
+- 沉淀可复用课程资产，支持后续迁移到机器学习、深度学习、大模型基础等课程。
 
 第一版目标用户：
 
@@ -19,9 +27,95 @@
 - 应用驱动加理解数学抽象。
 - 不是纯数学体系课，也不是工具使用课。
 
-## 2. MVP 范围
+## 2. System Boundary
 
-MVP 以“梯度下降与优化”为黄金样例，验证单章备课闭环。
+### 2.1 Official Hermes Core
+
+官方 `Hermes Agent` 是系统底座，运行在本机 `WSL2` 中，负责：
+
+- 持久记忆与跨会话检索。
+- 总结沉淀与自我净化。
+- 会话与消息网关。
+- subagent 调度与 skill/tool 调用框架。
+- 长期状态、日志、调试与自动化能力。
+
+这些能力不在本仓库中重造。
+
+### 2.2 Intellectual Tutor Course Layer
+
+本仓库只提供课程层能力：
+
+- 课程主 agent 与 subagent 设计。
+- 课程 workflow contracts。
+- 教学质量门禁。
+- 章节生成、审查、打包与回传逻辑。
+- 本机部署说明。
+- 企业微信接入配置说明。
+
+### 2.3 WeCom Entry
+
+教师入口直接使用官方 `Hermes Agent` 的 `WeCom (企业微信)` adapter。
+
+企业微信只做教师自然语言入口与附件回传，不承载课程业务逻辑，不自行维护一套 agent runtime。
+
+### 2.4 Non-ownership
+
+本仓库明确不负责：
+
+- 官方 Hermes 的记忆系统实现。
+- Hermes 的总结/净化机制实现。
+- Hermes gateway 主框架。
+- Hermes profile/session/memory 内核。
+- 官方平台 adapter 的主实现。
+
+## 3. Deployment Scope And Preconditions
+
+### 3.1 Deployment Scope
+
+第一版部署目标固定为：
+
+- 宿主机：当前这台 Windows 电脑。
+- 运行环境：`WSL2`。
+- Hermes 实例类型：专用于课程备课的 Hermes 实例。
+- 入口渠道：企业微信。
+
+### 3.2 Preconditions
+
+第一版承诺的是“前置条件满足后的全自动部署”，不是零前置全自动。
+
+必须满足的前置条件：
+
+- `WSL2` 已可用。
+- 官方 `Hermes Agent` 可在 `WSL2` 中安装运行。
+- 企业微信自建应用已创建。
+- 所需密钥、`Corp ID`、`Agent ID` 与回调配置已准备完毕。
+- 当前仓库位于 Windows 可稳定映射到 WSL2 的工作区路径中。
+
+### 3.3 Repository Role
+
+本仓库角色固定为：
+
+- Hermes 的课程 app / workflow 仓库。
+- 本机部署说明仓库。
+- WeCom 配置说明仓库。
+
+本仓库不是官方 Hermes 源码镜像，不 vendor 官方 Hermes 本体。
+
+## 4. MVP And v1 Goal
+
+### 4.1 v1 Goal
+
+第一版目标是在官方 Hermes 底座上，完成单章备课闭环的稳定验证：
+
+- 老师通过企业微信发起生成请求。
+- Hermes 调用课程 app workflow。
+- 生成结构化中间产物和最终上课包。
+- 老师可查询状态、提出修改、收到变更摘要并确认。
+- 系统按影响范围重生成并回传结果。
+
+### 4.2 Golden Sample
+
+首个黄金样例为“梯度下降与优化”。
 
 老师输入示例：
 
@@ -33,8 +127,11 @@ MVP 以“梯度下降与优化”为黄金样例，验证单章备课闭环。
 - DOCX：教案、讲稿、板书设计、课堂提问、作业、标准答案与评分 rubrics。
 - IPYNB：Python 实验 notebook。
 - Markdown/YAML 中间源稿：用于审校、复用和版本管理。
+- 审查与发布产物：`quality_review.yaml`、`teacher_summary.md`、`release_manifest.yaml`。
 
-单章生成链路：
+### 4.3 Chapter Teaching Chain
+
+单章生成链路固定为：
 
 1. AI 应用驱动：从模型训练、损失函数、参数更新等真实问题切入。
 2. 数学抽象理解：解释梯度、方向导数、学习率、收敛等核心概念。
@@ -42,58 +139,226 @@ MVP 以“梯度下降与优化”为黄金样例，验证单章备课闭环。
 4. 实验验证：通过 Python notebook 可视化损失下降和参数更新。
 5. 作业评价：提供概念题、推导题、实验题、答案和评分标准。
 
-## 3. 三层架构
+### 4.4 Teacher Loop In Scope
 
-PRD 采用三层可复用架构。
+第一版教师闭环固定为：
 
-### 3.1 课程无关核心层
+- 生成上课包。
+- 查询状态。
+- 提修改。
+- 二次确认后重生成。
 
-负责稳定工作流：
+教师允许修改到：
 
-- 任务拆解。
-- 单章备课流程。
-- 教学目标生成。
-- 成品生成。
-- 文件型资产沉淀。
-- 质量审查。
+- 教学内容。
+- 章节配置。
 
-### 3.2 AI 课程群领域层
+教师不得直接修改：
 
-面向 AI 课程群的可复用模板：
+- 系统红线。
+- 来源可信规则。
+- 课程级质量基线。
+- 其他系统治理规则。
 
-- AI 数学基础。
-- 机器学习。
-- 深度学习。
-- 大模型基础。
-- 生成式 AI。
-- AI 工程实践。
+## 5. Course App Architecture
 
-### 3.3 章节实例层
+### 5.1 Layered Architecture
 
-首个章节为“梯度下降与优化”。后续章节必须复用同一套 agent 协议和模板：
+课程 app 的稳定协作链路为：
 
-- 矩阵与向量空间。
-- 概率分布与贝叶斯。
-- 信息论。
-- 反向传播。
-- 注意力机制。
-- 表示学习。
-- Transformer。
-- 扩散模型基础。
+`Hermes Core -> Professor Architect Agent -> Subagent 结构化脚本 -> Course Tools / Skills -> 发布与回传`
 
-复用原则：
+这里的三层调用含义是：
 
-- 章节内容可变，教学链路稳定。
-- 学科知识可替换，agent 协作协议稳定。
-- 课程风格可沉淀，生成流程可复用。
+1. 主 agent 层：理解老师意图、决定 workflow、分发任务、聚合审查结果。
+2. subagent / skill 层：把任务转成结构化中间稿与规则化判断。
+3. tool 层：读取结构化输入并执行最终文件生成、校验、打包和回传。
 
-## 4. 核心配置接口
+### 5.2 Main Agent
+
+课程层主 agent 为 `Professor Architect Agent`。它运行在 Hermes 中，具备大学教师判断力和课程架构编排能力。
+
+职责：
+
+- 理解教师任务。
+- 补齐课程上下文。
+- 拆解单章备课任务。
+- 委派 subagent。
+- 产出统一的 `lesson_plan.yaml`。
+- 根据质量审查结果发出返工指令。
+- 维护教学主线和质量闭环。
+
+禁止：
+
+- 直接承担 PPT 版式。
+- 直接承担公式渲染细节。
+- 直接承担 notebook 文件工艺。
+- 绕过 subagent / tool 直接拼装最终交付件。
+
+### 5.3 Subagents
+
+Subagent 只负责把 `lesson_plan.yaml` 转译成某类产物的结构化脚本，不直接产出最终文件。
+
+- `PPT Script Subagent`
+  - 输出：`ppt_script.yaml`
+  - 负责：slide 映射、reveal steps、notes、formula spec、visual intent。
+- `Notebook Lab Subagent`
+  - 输出：`notebook_script.yaml`
+  - 负责：实验目标、代码单元、观察问题、预期现象。
+- `Quality Review Subagent`
+  - 输出：`quality_review.yaml`
+  - 负责：审查结论、问题清单、修改建议、返工责任方。
+- `Source Curator Subagent`
+  - 输出：`source_proposal.yaml`、`source_decision.yaml`、`sources.yaml`
+  - 负责：来源筛选、锚点定位、适用范围与可信边界。
+
+### 5.4 Course Skills
+
+Skill 负责稳定固化课程规则和流程知识，不自行发明教学内容。
+
+第一版至少需要：
+
+- 课程备课 workflow skill。
+- 教学质量门禁 skill。
+- 变更摘要与确认流程 skill。
+- 来源治理与补源提示 skill。
+
+### 5.5 Course Tools
+
+Tool 负责执行能力，不负责课程决策。
+
+第一版至少需要：
+
+- `lesson_plan_builder`
+- `ppt_designer`
+- `formula_renderer`
+- `notebook_builder`
+- `verification`
+- `release_packager`
+- `status_reader`
+- `change_applier`
+
+## 6. Teacher Interaction Loop
+
+### 6.1 Supported Actions
+
+第一版支持的教师自然语言动作：
+
+- 查询状态。
+- 修改教学内容。
+- 发起补源。
+- 触发复审与重生成。
+
+### 6.2 Write Safety Rule
+
+查询类请求可以直接返回结果。
+
+写入类请求必须遵循：
+
+1. 先输出变更摘要。
+2. 再由老师二次确认。
+3. 确认后按影响范围重跑。
+
+第一版确认交互形态固定为：
+
+- 文本摘要。
+- 明确确认词。
+
+聊天里允许自然语言变更摘要，不要求老师阅读 YAML diff。
+
+### 6.3 Ambiguity Rule
+
+聊天里如章节存在歧义，必须追问，不得静默猜测。
+
+老师连续提出多条修改意见时，系统应支持：
+
+- 先汇总。
+- 再一次确认。
+
+老师确认后应立即按影响范围重跑，而不是只写 `override.yaml`。
+
+### 6.4 Scope-aware Regeneration
+
+重跑必须按影响范围进行，而非默认整章重做。
+
+至少区分：
+
+- 只影响 `lesson_plan.yaml`
+- 影响 `ppt_script.yaml`
+- 影响 `notebook_script.yaml`
+- 需要整章复审
+
+## 7. WeCom Entry
+
+### 7.1 Channel Strategy
+
+第一版首选聊天渠道为企业微信（WeCom）。
+
+后续扩展目标为：
+
+- 飞书
+
+第一版不以 Web 教师控制台作为教师主入口。
+
+### 7.2 Space Model
+
+第一版按“先单学科”落地。
+
+当前 v1 入口模型固定为：
+
+- 一个企业微信应用。
+- 对应一个学科入口。
+- 对应该老师当前这门课的主 agent。
+
+后续扩展路径固定为：
+
+- 单应用多学科入口。
+
+### 7.3 Identity And State
+
+企业微信身份与教师画像在开通时一次绑定。
+
+学科空间聊天状态默认持久保存，至少包括：
+
+- 当前学科。
+- 最近章节上下文。
+- 待确认修改。
+- 最近一次运行结果。
+- 最近一次审查状态。
+
+### 7.4 Task Feedback And Delivery
+
+第一版长任务反馈采用：
+
+- 接单确认。
+- 关键阶段进度通知。
+- 完成通知。
+
+第一版结果回传采用：
+
+- 自然语言摘要。
+- 主要文件优先直接发附件。
+- 保留整包链接能力。
+
+默认附件回传形态为：
+
+- 摘要。
+- 主要文件。
+- 可选整包链接。
+
+当附件超限时，当前默认降级策略为：
+
+- 自动拆分多文件。
+
+如必须通过链接回传，链接目标应使用对象存储或文件服务。
+
+## 8. Workflow Contracts
+
+### 8.1 Course And Chapter Config
 
 第一版采用文件型资产库，核心配置以 Markdown/YAML 为主。
 
-### 4.1 course.yaml
-
-描述课程级配置：
+`course.yaml` 描述课程级配置：
 
 - 课程名称。
 - 目标学生。
@@ -105,9 +370,7 @@ PRD 采用三层可复用架构。
 - 作业难度。
 - 语言策略。
 
-### 4.2 chapter.yaml
-
-描述章节级配置：
+`chapter.yaml` 描述章节级配置：
 
 - 章节主题。
 - 先修知识。
@@ -117,125 +380,180 @@ PRD 采用三层可复用架构。
 - 实验目标。
 - 输出产物。
 - 评价方式。
+- `dynamic_assets_required`
+- `bridge_time_budget`
+- `bridge_module_limit`
 
-### 4.3 teacher_profile.md
+### 8.2 Profile Contract
 
-描述教师风格和偏好：
+原 `teacher_profile.md` 演进为结构化 `profile.yaml`。
 
-- 表达风格。
-- 常用案例。
-- 讲课节奏。
-- 板书偏好。
-- 评分偏好。
-- 禁用或慎用表达。
+`profile.yaml` 最小字段要求：
 
-### 4.4 agent_brief.yaml
+- `expression_style`
+- `lecture_rhythm`
+- `boardwork_preference`
+- `caution_phrases`
+- `avoid_expressions`
+- `domain_case_preference`
+- `grading_preference`
 
-描述主 agent 委派给 subagent 的任务：
+画像采用两层合并：
 
-- 任务目标。
-- 必要上下文。
-- 输入资料。
-- 输出格式。
-- 质量要求。
-- 禁止事项。
+- 课程默认画像。
+- 教师覆盖画像。
 
-## 5. 知识来源机制
+教师画像可影响：
 
-知识来源分三层。
+- `Professor Architect Agent`
+- 表达与呈现层。
 
-### 5.1 教师核心资料层
+教师画像不得影响：
 
-教师资料是课程主锚点，包括：
+- 来源可信规则。
+- 系统红线。
+- 质量门禁。
 
-- 教师 PPT。
-- 讲义。
-- 题库。
-- 历年教案。
-- 课堂讲稿。
+### 8.3 Lesson Plan Contract
 
-作用：
+`lesson_plan.yaml` 是主 agent 到所有 subagent 的唯一教学内容源。
 
-- 决定讲课立场。
-- 决定知识边界。
-- 决定表达风格。
-- 决定课程主线。
+每个核心节点必须具备稳定的语义化 `node_id`，并在各产物间保持一致。
 
-### 5.2 Agent 自动补充层
+核心节点类型固定为：
 
-Agent 可补充：
+- `concept`
+- `bridge`
+- `misconception`
+- `experiment`
+- `check`
+- `homework`
+- `conclusion`
 
-- 最新 AI 应用案例。
-- 生活化类比。
-- 行业新闻。
-- 开源项目例子。
-- 新论文中的可讲部分。
-- 配图建议。
-- 演示素材建议。
+每个核心节点至少必须包含：
 
-作用：
+- 概念内容。
+- 补桥模块。
+- AI 映射。
+- 实验观察点。
+- 学生理解证据。
+- `source_refs`
 
-- 增强新鲜感。
-- 增强可理解性。
-- 增强案例丰富度。
+每章结果必须稳定回答四个问题：
 
-### 5.3 审核与合成层
+1. 学生为什么需要学这个数学概念？
+2. 这个概念解释了 AI 模型里的哪个关键设计？
+3. 学生如何通过实验看到这个数学概念在起作用？
+4. 老师如何判断学生是否真正理解，而不是只会背公式？
 
-自动补充内容不能直接进入成品，必须经过筛选：
+### 8.4 PPT Contract
 
-- 是否和教师课程目标一致。
-- 是否与当前章节匹配。
-- 是否难度合适。
-- 是否表达风格兼容。
-- 是否可追溯。
+PPT 明确采用“富内容讲义型 PPT”，而非极简演讲型 PPT。
 
-## 6. Agent 团队
+`ppt_script.yaml` 最低新增字段：
 
-主 agent 为 `Professor Architect Agent`，同时具备大学教师判断力和顶级全栈 AI 架构师的任务编排能力。
+- `node_id`
+- `main_question`
+- `key_takeaway`
+- `bridge_flag`
 
-主 agent 职责：
+`PPT Script Subagent` 负责节点到 slide 的映射。
 
-- 理解教师任务。
-- 补齐课程上下文。
-- 拆解单章备课任务。
-- 委派 subagent。
-- 产出统一的 lesson plan。
-- 根据质量审查结果发出返工指令。
-- 维护教学主线和质量闭环。
+`ppt_designer` 只执行脚本，不决定教学分页。
 
-主 agent 不直接承担 PPT 版式、公式渲染、notebook 文件工艺或最终文件细节。
+### 8.5 Notebook Contract
 
-稳定协作链路为：
+Notebook 由 `experiment` 节点驱动，而不是整章自由设计。
 
-`Professor Architect Agent -> Subagent 结构化脚本 -> Skill 稳定执行文件产物`
+`notebook_script.yaml` 只能描述：
 
-### 6.1 Subagent
+- 实验目标。
+- 代码单元。
+- 观察问题。
+- 预期现象。
 
-Subagent 只负责把 lesson plan 转译成某类产物的结构化脚本，不直接产出最终文件。
+Notebook 与 PPT / lesson plan 默认采用 `node_id` 级对齐。
 
-- `PPT Script Subagent`：把 lesson plan 转换为 `ppt_script.yaml`，描述 slide type、reveal steps、notes、formula spec 和 visual intent；不输出 PPTX，不指定最终坐标、字体、颜色或版式。
-- `Notebook Lab Subagent`：把 lesson plan 转换为 notebook 实验脚本，描述实验目标、代码单元、观察问题和预期现象；不直接产出最终 IPYNB 文件。
-- `Quality Review Subagent`：只给审查结论和修改建议，指出应返工的责任方；不直接改 lesson plan、slide script 或 notebook script。
+第一版标准要求为：整本 notebook 端到端可重跑。
 
-### 6.2 Skills
+### 8.6 Review And Release Contracts
 
-Skill 只负责稳定执行结构化脚本，不决定教学内容。
+结构化一等公民产物包括：
 
-- `ppt_designer`：读取 `ppt_script.yaml` 和视觉配置，输出 PPTX 和 PPT 质量报告。
-- `formula_renderer`：读取 formula spec，稳定渲染公式并保证符号表达清晰。
-- `notebook_builder`：读取 notebook 实验脚本，输出可运行 IPYNB 和必要图像。
-- `verification`：检查最终产物、source bundle 和架构边界是否满足验收要求。
+- `quality_review.yaml`
+- `teacher_summary.md`
+- `release_manifest.yaml`
+- `override.yaml`
+- `override_history.yaml`
+- `source_proposal.yaml`
+- `source_decision.yaml`
+- `sources.yaml`
+- `sources_catalog.yaml`
 
-### 6.3 接口与返工规则
+所有结构化文件必须带顶层 `schema_version`。
 
-- `lesson_plan.yaml` 是主 agent 到所有 subagent 的唯一教学内容源。
-- `ppt_script.yaml` 只能描述课堂结构、揭示步骤、公式、讲者备注和视觉意图。
-- notebook 中间脚本只能描述实验目标、代码单元、观察问题和预期现象。
-- Quality Review 输出只包含是否可上课、问题清单、修改建议和应返工责任方。
-- 教学主线问题由 `Professor Architect Agent` 修 lesson plan。
-- PPT 结构问题由 `PPT Script Subagent` 修 slide script。
-- 实验问题由 `Notebook Lab Subagent` 修 notebook script。
-- 文件工艺问题由对应 skill 重新执行。
+所有治理链产物必须带 `run_id` 与统一时间戳字段。
+
+`run_id` 采用“时间戳 + 短随机后缀”格式，并贯穿所有治理链与发布链。
+
+## 9. Source Governance And Teacher Override
+
+### 9.1 Source Governance
+
+专业内容来源采用“权威来源库 + Agent 生成 + 审查闭环”。
+
+公开来源采用白名单机制，不做无限制动态抓取。
+
+来源治理产物：
+
+- `source_proposal.yaml`
+- `source_decision.yaml`
+- `sources.yaml`
+- `sources_catalog.yaml`
+
+来源 `trust_level` 采用三级制：
+
+- `core`
+- `approved`
+- `supplemental`
+
+全部核心教学节点必须带 `source_refs`，不得出现无来源核心节点。
+
+当本地来源库缺少足够高可信来源时：
+
+- 默认阻断。
+- 提示补源。
+- 不得先生成再警告。
+
+### 9.2 Override Governance
+
+`override.yaml` 升级为一等公民产物。
+
+只允许覆盖 `lesson_plan.yaml` 的节点字段，不允许直接覆盖：
+
+- `ppt_script.yaml`
+- `quality_review.yaml`
+- 系统规则类配置
+
+默认允许覆盖的高频字段包括：
+
+- `main_question`
+- `key_takeaway`
+- `bridge_toggle`
+- `classroom_questions`
+- `homework` 相关字段
+
+如 override 触及以下任一条件，必须阻断并复审：
+
+- 红线
+- 来源可信链
+- 教学主线
+
+override 后默认重审受影响节点；如影响主线、补桥预算或章节红线，则升级为整章复审。
+
+## 10. Quality Gates And Release
+
+### 10.1 Core Gates
 
 所有成品生成前必须通过三重质量门禁：
 
@@ -243,135 +561,200 @@ Skill 只负责稳定执行结构化脚本，不决定教学内容。
 2. 数学可信。
 3. AI 连接有效。
 
-## 7. 大学资深教师痛点验证
+`quality_review.yaml` 主结构固定为：
 
-从大学资深教师视角看，本项目方向正确，但必须清楚区分“能解决的痛点”和“不能替代的判断”。
+1. 红线检查
+2. 关键节点结果
+3. 维度打分
+4. 返工指令
 
-### 7.1 能真正解决的痛点
+通用评分维度固定为：
 
-第一，备课材料生产压力。大学教师最累的不是写一页 PPT，而是把一章内容组织成“为什么讲、怎么讲、讲到多深、配什么例子、出什么作业”。如果 Agent 能稳定产出 PPTX、讲稿、实验、作业、答案和 rubrics，就能减少大量机械劳动。
+- `teachability`
+- `trustworthiness`
+- `ai_alignment`
+- `teacher_relief`
 
-第二，数学和 AI 应用之间的断层。《人工智能数学基础》的学生常常知道公式，却不知道公式解释了模型里的哪个设计。系统必须持续产出“应用问题 -> 数学抽象 -> 模型解释”的教学链条。
+### 10.2 Release Gate
 
-第三，青年教师和新开课教师的启动成本。第一次讲这门课的老师通常没有完整课程资产，系统应提供可直接修改的课程骨架，而不是让老师从空白文档开始。
+发布门禁固定为：
 
-第四，课程资产沉淀。大学教师重视材料是否能持续复用、继承个人风格、跨学期迭代。文件型资产库是第一版正确选择。
+- 红线全过
+- 章节总分达标
+- 关键节点全过
 
-### 7.2 暂不能完全解决的痛点
+第一版高标准门槛固定为：
 
-第一，不能替代教师对学生现场状态的判断。研究生背景差异很大，哪些地方学生真的卡住、哪些地方可以跳过，需要教师在课堂中判断。
+- 红线全过
+- 总分 90+
+- 关键节点全过
+- 教师 10 分钟内可上课
 
-第二，数学严谨性是高风险点。梯度下降、概率、优化、信息论等内容很容易出现“看起来对，细看不严谨”的解释。必须由 `Professor Architect Agent` 在 lesson plan 中标注适用边界，并由 `Quality Review Subagent` 审查。
+### 10.3 Run Layout
 
-第三，最新 AI 案例容易浮于表面。新案例必须服从章节目标，不能为了新鲜而削弱概念理解。
+运行产物根目录采用独立 `outputs/runs`，不与静态配置目录混放。
 
-第四，成品文件质量门槛高。老师真正需要的是“改十分钟就能上课”的材料，而不是表面完整、实际不可讲的文件。
+每章目录下按 `run_id` 保存运行结果。
 
-### 7.3 每章必须回答的四个问题
+默认目录分层采用：
 
-每章生成结果必须稳定回答：
+- `release/teaching`
+- `review/summary`
+- `source_bundle`
 
-1. 学生为什么需要学这个数学概念？
-2. 这个概念解释了 AI 模型里的哪个关键设计？
-3. 学生如何通过实验看到这个数学概念在起作用？
-4. 老师如何判断学生是否真正理解，而不是只会背公式？
+`teacher_summary.md` 必须每次运行都生成，无论通过还是阻断。
 
-如果每章都能回答这四个问题，系统才是真正解决大学教师痛点的智能助教，而不是一次性内容生成器。
+默认路径：
 
-## 8. 产品边界
+- `review/summary/teacher_summary.md`
+
+`release_manifest.yaml` 为必备产物，至少包含：
+
+- `schema_version`
+- `run_id`
+- `chapter_id`
+- `artifact_list`
+- `schema_versions`
+- `gate_result`
+
+### 10.4 Source Bundle And Debug
+
+`source_bundle` 必须打包快照，而非只放引用，至少包括：
+
+- `sources`
+- `profile`
+- `lesson_plan`
+- `override`
+- `quality_review`
+- `release_manifest`
+- `source_proposal`
+- `source_decision`
+- 相关课程与章节配置快照
+
+调试入口采用：
+
+- `source_bundle/debug_index.md`
+
+日志保留在 subagent / skill 任务级，并带 `run_id`。
+
+## 11. Testing And Regression
+
+### 11.1 Golden Samples
+
+第一版至少维护 2 个对比样例：
+
+- 梯度下降
+- 概率 / 随机过程类章节
+
+黄金样例回归优先比对结构化中间产物：
+
+- `lesson_plan`
+- `ppt_script`
+- `quality_review`
+- `release_manifest`
+
+最终成品只做存在性与门禁级别检查，不做第一优先级回归基线。
+
+### 11.2 Reuse Tests
+
+用同一套课程 app workflow 迁移到：
+
+- 矩阵与向量空间
+- 概率分布与贝叶斯
+
+验收要求：
+
+- 不重写主 agent
+- 不改变核心备课流程
+- 只替换课程模板和章节配置
+
+### 11.3 Teacher Priority Tests
+
+提供旧 PPT 或讲义时，生成内容必须继承：
+
+- 课程主线
+- 术语偏好
+- 表达风格
+- 章节边界
+
+### 11.4 Knowledge Enhancement Tests
+
+Agent 补充的新案例必须：
+
+- 标注来源或说明依据
+- 通过章节匹配审查
+- 通过难度审查
+- 不覆盖教师核心资料
+
+### 11.5 WeCom End-to-End Tests
+
+企业微信端到端验证至少覆盖：
+
+- 新生成请求
+- 状态查询
+- 修改请求
+- 变更摘要
+- 明确确认词
+- 按影响范围重生成
+- 关键附件回传
+
+### 11.6 Local Deployment Smoke Tests
+
+本机部署 smoke test 至少覆盖：
+
+- WSL2 中 Hermes 可启动
+- WeCom adapter 可接收消息
+- 本仓库 workflow 可被 Hermes 调用
+- 生成结果可写入 `outputs/runs`
+
+## 12. Non-goals And Future Expansion
+
+### 12.1 Non-goals For v1
+
+第一版不做：
+
+- 飞书入口
+- 多学科共享入口
+- Web 教师工作台
+- 通用 Hermes 化
+- 个人微信入口
+- 无审查的动态外部抓取
+
+### 12.2 Product Boundary
 
 系统是教师备课与复盘副驾驶，不是自动授课系统。
 
 系统应该做：
 
-- 生成结构化备课材料。
-- 帮助教师把数学抽象和 AI 应用连接起来。
-- 提供可运行实验和可评价作业。
-- 沉淀教师课程资产。
-- 提醒数学严谨性和案例相关性风险。
-- 保持主 agent、subagent 和 skill 的职责边界清晰。
+- 生成结构化备课材料
+- 帮助教师把数学抽象和 AI 应用连接起来
+- 提供可运行实验和可评价作业
+- 沉淀教师课程资产
+- 提醒数学严谨性和案例相关性风险
 
 系统不应该做：
 
-- 自动替教师完成课堂现场判断。
-- 在未审查来源的情况下使用外部资料。
-- 输出没有可追溯依据的最新案例。
-- 为了生成完整文件而牺牲教学逻辑和数学严谨性。
-- 让主 agent 直接承担所有版式与文件工艺。
-- 让 subagent 直接输出最终文件。
-- 让 skill 自行发明教学内容。
-- 让 quality review 同时审查和修改内容。
+- 自动替教师完成课堂现场判断
+- 输出无可追溯依据的最新案例
+- 为了生成完整文件而牺牲教学逻辑和数学严谨性
+- 让主 agent 直接承担所有版式与文件工艺
+- 让 subagent 直接输出最终文件
+- 让 tool / skill 自行发明教学内容
 
-## 9. 测试计划
+### 12.3 Future Expansion
 
-### 9.1 黄金样例测试
+后续可扩展方向包括：
 
-输入“研究生课程，主题：梯度下降与优化”，生成 PPTX、DOCX、IPYNB 全套材料。
+- 飞书
+- 多学科空间
+- Web 审查工作台
+- 更多课程模板
+- 课程专用 Hermes 发行版 / 封装版
 
-验收要求：
+## 13. Open Questions
 
-- PPTX 可直接进入人工修改。
-- DOCX 结构完整。
-- IPYNB 可运行。
-- 内容体现“应用驱动 -> 数学抽象 -> 模型解释 -> 实验验证 -> 作业评价”。
+以下问题尚未锁定，后续应继续讨论：
 
-### 9.2 复用测试
-
-用同一套模板迁移到：
-
-- 矩阵与向量空间。
-- 概率分布与贝叶斯。
-
-验收要求：
-
-- 不重写主 agent。
-- 不改变核心备课流程。
-- 只替换课程模板和章节配置。
-
-### 9.3 教师资料优先测试
-
-提供旧 PPT 或讲义时，生成内容必须继承：
-
-- 课程主线。
-- 术语偏好。
-- 表达风格。
-- 章节边界。
-
-### 9.4 知识增强测试
-
-Agent 补充的新案例必须：
-
-- 标注来源或说明依据。
-- 通过章节匹配审查。
-- 通过难度审查。
-- 不覆盖教师核心资料。
-
-### 9.5 成品质量测试
-
-成品必须满足：
-
-- 中文主讲，保留关键英文术语。
-- 教学节奏可讲。
-- 数学表达可信。
-- AI 应用连接有效。
-- 老师能继续编辑和版本管理。
-
-### 9.6 架构边界测试
-
-PRD、README、MVP 说明和 `agent_brief.yaml` 必须使用同一套 agent/subagent/skill 命名。
-
-验收要求：
-
-- 不出现“主 agent 直接生成最终 PPTX”的职责描述。
-- 不出现“skill 自行补充教学内容”的职责描述。
-- Quality Review 只给修改建议，不直接修改内容。
-- source bundle 保留 lesson plan、结构化脚本、质量标准和生成配置，便于返工追踪。
-
-## 10. 假设
-
-- 第一版产品形态是 Hermes Agent 包，不做 Web 教师工作台。
-- 目标用户是讲授 AI 课程群的大学教师，首要场景是研究生补基础。
-- 教学风格采用“应用驱动加理解数学抽象”。
-- 资产库第一版采用文件型结构，后续可再接数据库或 Web 工作台。
-- 默认语言策略为中文主讲 + 英文术语。
-- 当前 MVP 优先完成文件型资产、结构化脚本和本地生成闭环；正式 Hermes Agent 配置、可独立复用的 skills/tools 可在下一阶段拆出。
+- 老师自助开通学科空间时，如果自由输入的学科名命中多个模板，系统如何处理。
+- 老师自助开通学科空间时，如果输入的学科名没有任何已发布模板，系统如何处理。
+- 模板开通成功后，是否在聊天里返回模板版本、学科空间标识和后续可执行动作。

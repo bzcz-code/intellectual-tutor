@@ -1,0 +1,26 @@
+schema_version: "0.1.0"
+run_id: "20260424-000000-demo"
+chapter_id: "gradient_descent"
+source_lesson_plan: "outputs/runs/gradient_descent/20260424-000000-demo/source_bundle/lesson_plan.yaml"
+slides:
+  - slide_id: "S01"
+    node_id: "gradient_descent-concept-loss"
+    slide_type: "hook"
+    order: 1
+    title: "模型错了以后，参数为什么知道往哪改？"
+    main_question: "loss 只告诉我们什么？"
+    key_takeaway: "loss 不是方向盘，梯度才是方向信息。"
+    bridge_flag: true
+    teaching_purpose: "建立课堂驱动问题"
+    layout: "title_overview"
+    content_blocks:
+      - block_id: "S01-Q"
+        kind: "callout"
+        text: "核心问题：loss 只告诉我们错得多严重。"
+    reveal_steps:
+      - step_id: "S01-R1"
+        kind: "question"
+        target_ref: "S01-Q"
+    formula_spec: []
+    notes: "先建立问题，不急着写公式。"
+    visual_intent: "讲义型页面，问题与训练闭环配图并列。"

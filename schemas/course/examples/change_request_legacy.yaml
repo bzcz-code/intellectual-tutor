@@ -1,0 +1,18 @@
+schema_version: "0.1.0"
+request_id: "change-legacy-example-000001"
+run_id: "replace-with-run-id"
+chapter_id: "gradient_descent"
+teacher_id: "teacher-demo"
+requested_at: "2026-04-24T00:00:00Z"
+request_text: "Keep the chapter structure, but make the key message more directly tied to parameter updates."
+intent_scope:
+  modifies_teaching_content: true
+  modifies_chapter_config: false
+  touches_course_baseline: false
+  touches_source_rules: false
+proposed_changes:
+  - target: "lesson_plan"
+    field: "lesson.key_message"
+    old_value: "The gradient turns error into a parameter-update direction."
+    new_value: "The gradient turns model error into an actionable parameter-update direction, and the learning rate scales each step."
+    reason: "The teacher wants a clearer classroom phrasing for the chapter headline."

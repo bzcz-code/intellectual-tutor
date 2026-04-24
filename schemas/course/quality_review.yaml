@@ -1,0 +1,38 @@
+schema_version: "0.1.0"
+run_id: "20260424-000000-demo"
+chapter_id: "gradient_descent"
+reviewed_at: "2026-04-24T00:00:00Z"
+redline_checks:
+  passed: true
+  blocked_reasons: []
+critical_nodes_passed:
+  passed: true
+  failed_node_ids: []
+node_results:
+  - node_id: "gradient_descent-concept-loss"
+    severity: "minor"
+    teachability:
+      score: 18
+      evidence:
+        - "主问题明确"
+        - "结论可讲"
+    trustworthiness:
+      score: 17
+      evidence:
+        - "有来源锚点"
+    ai_alignment:
+      score: 18
+      evidence:
+        - "和训练反馈链条绑定"
+    teacher_relief:
+      score: 16
+      evidence:
+        - "可直接转为讲稿和课件"
+dimension_scores:
+  teachability: 18
+  trustworthiness: 18
+  ai_alignment: 19
+  teacher_relief: 17
+total_score: 92
+release_recommendation: "released"
+rework_instructions: []
